@@ -9,6 +9,8 @@ module.exports = class Game {
 
     wss.on('connection', (ws, req) => {
 
+      this._send(ws, {cmd: 'connected'})
+
       ws.on('message', (message) => {
 
         let data = JSON.parse(message);
@@ -20,6 +22,8 @@ module.exports = class Game {
             cmd: 'status',
             status: this._retrieve_status(data.lobby)
           });
+        } else if(data.token && this._verify(data)) {
+          this.lobbys[data.lobby].handleData(ws, data);
         }
 
       });
@@ -38,8 +42,8 @@ module.exports = class Game {
 
       let lobby = this.lobbys[code];
 
-      if(lobby && lobby.isWaiting) {
-        return 'waiting';
+      if(lobby) {
+        return lobby.isWaiting ? 'waiting': 'closed';
       } else {
         return 'open';
       }
@@ -48,6 +52,10 @@ module.exports = class Game {
 
     return 'closed';
 
+  }
+
+  _verify(data) {
+    return this.lobbys[data.lobby] && this.lobbys[data.lobby].token == data.token;
   }
 
   addLobby(code) {

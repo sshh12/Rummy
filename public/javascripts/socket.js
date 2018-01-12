@@ -17,7 +17,10 @@ socket.onmessage = (message) => {
 
   let data = JSON.parse(message.data);
   console.log(data);
-  socketHandlers[data.cmd](data);
+
+  if(data.cmd in socketHandlers){
+    socketHandlers[data.cmd](data);
+  }
 
 }
 

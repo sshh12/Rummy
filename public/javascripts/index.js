@@ -1,18 +1,7 @@
 
-let getLobbyStatus = (code) => {
-
-  send({
-    'cmd': 'status',
-    'lobby': code
-  });
-
-};
-
 let joinGame = () => {
 
-  let code = $('#code').val();
-
-  window.location.href = "/join/" + code;
+  window.location.href = "/join/" + $('#code').val();
 
 }
 
@@ -23,7 +12,7 @@ socketHandlers.status = (data) => {
       $('#lobbybtn').addClass('btn-success');
       $('#lobbybtn').html('Join');
       $('#lobbybtn').on('click', () => { joinGame(); });
-    } else if(data.status == 'playing') {
+    } else if(data.status == 'closed') {
       $('#lobbybtn').addClass('btn-danger');
       $('#lobbybtn').html('Full');
     } else if(data.status == 'open') {
@@ -39,7 +28,7 @@ $('#code').on('keyup', () => {
 
   $('#lobbybtn').on('click', () => {});
 
-  let code = $('#code').val();
+  let code = "" + $('#code').val();
 
   if(/^\w{5}$/.test(code)) {
 
@@ -47,9 +36,12 @@ $('#code').on('keyup', () => {
     $('#lobbybtn').removeClass('btn-info');
     $('#lobbybtn').removeClass('btn-danger');
     $('#lobbybtn').removeClass('btn-success');
-    $('#lobbybtn').html('...');
+    $('#lobbybtn').html('....');
 
-    getLobbyStatus(code);
+    send({
+      'cmd': 'status',
+      'lobby': code
+    });
 
   } else {
 

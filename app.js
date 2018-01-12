@@ -28,8 +28,8 @@ app.get('/join/:lobby', function (req, res) {
 })
 
 app.get('/game/:lobby/:token', function (req, res) {
-  let code = req.params.lobby, token = req.params.token;
-  if(rummy.lobbys[code].token == token) {
+  let code = "" + req.params.lobby, token = req.params.token;
+  if(req.params.token && rummy.lobbys[code] && rummy.lobbys[code].token == token) {
     res.sendFile(__dirname + '/public/game.html');
   } else {
     res.redirect('/');
