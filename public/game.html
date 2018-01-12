@@ -7,6 +7,7 @@
   <title>Rummy</title>
 
   <link rel="stylesheet" href="/stylesheets/main.css">
+  <link rel="stylesheet" href="/stylesheets/game.css">
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" crossorigin="anonymous">
@@ -15,23 +16,14 @@
 </head>
 
 <body>
-  <div class="page-header">
-    <h1 class="centered">Rummy</h1>
-    <p class="lead centered">Enter or create a game lobby.</p>
+  <div id="cards">
+
   </div>
-  <div class="justsmallenough centered panel panel-default">
-    <div class="panel-body">
-      <div class="input-group">
-        <input id="code" type="text" class="form-control">
-        <span class="input-group-btn">
-        <button id="lobbybtn" class="btn btn-default" type="button">Join</button></div>
-      </span>
-      </div>
-    </div>
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/javascripts/socket.js"></script>
 <script src="/javascripts/index.js"></script>
+<script src="/javascripts/main.js"></script>
 
 </html>

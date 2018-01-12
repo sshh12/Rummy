@@ -1,0 +1,234 @@
+body {
+  background-color: #252525 !important;
+}
+
+.card {
+  background-image: url('../cards.png');
+  -webkit-background-size: 2004px 800px;
+  background-size: 2004px 800px;
+  width: 141px;
+  height: 198px;
+  position: absolute;
+  z-index: 2;
+  border: 1px solid #333;
+  border-radius: 10px;
+  -webkit-transition: -webkit-transform .6s ease-out;
+  transition: -webkit-transform .6s ease-out;
+  transition: -ms-transform .6s ease-out;
+  transition: transform .6s ease-out;
+  -webkit-transform: translateX(0px) translateY(0px) rotateZ(0deg);
+  -ms-transform: translateX(0px) translateY(0px) rotateZ(0deg);
+  transform: translateX(0px) translateY(0px) rotateZ(0deg);
+}
+
+.hidden {
+  background-position: -1862px -1px !important;
+}
+
+._A.spade {
+  background-position: -1px -401px;
+}
+
+._2.spade {
+  background-position: -144px -401px;
+}
+
+._3.spade {
+  background-position: -287px -401px;
+}
+
+._4.spade {
+  background-position: -430px -401px;
+}
+
+._5.spade {
+  background-position: -572px -401px;
+}
+
+._6.spade {
+  background-position: -715px -401px;
+}
+
+._7.spade {
+  background-position: -858px -401px;
+}
+
+._8.spade {
+  background-position: -1001px -401px;
+}
+
+._9.spade {
+  background-position: -1143px -401px;
+}
+
+._10.spade {
+  background-position: -1286px -401px;
+}
+
+._J.spade {
+  background-position: -1429px -401px;
+}
+
+._Q.spade {
+  background-position: -1573px -401px;
+}
+
+._K.spade {
+  background-position: -1716px -401px;
+}
+
+._A.heart {
+  background-position: -1px -201px;
+}
+
+._2.heart {
+  background-position: -144px -201px;
+}
+
+._3.heart {
+  background-position: -287px -201px;
+}
+
+._4.heart {
+  background-position: -430px -201px;
+}
+
+._5.heart {
+  background-position: -572px -201px;
+}
+
+._6.heart {
+  background-position: -715px -201px;
+}
+
+._7.heart {
+  background-position: -858px -201px;
+}
+
+._8.heart {
+  background-position: -1001px -201px;
+}
+
+._9.heart {
+  background-position: -1143px -201px;
+}
+
+._10.heart {
+  background-position: -1286px -201px;
+}
+
+._J.heart {
+  background-position: -1429px -201px;
+}
+
+._Q.heart {
+  background-position: -1573px -201px;
+}
+
+._K.heart {
+  background-position: -1716px -201px;
+}
+
+._A.diamond {
+  background-position: -1px -601px;
+}
+
+._2.diamond {
+  background-position: -144px -601px;
+}
+
+._3.diamond {
+  background-position: -287px -601px;
+}
+
+._4.diamond {
+  background-position: -430px -601px;
+}
+
+._5.diamond {
+  background-position: -572px -601px;
+}
+
+._6.diamond {
+  background-position: -715px -601px;
+}
+
+._7.diamond {
+  background-position: -858px -601px;
+}
+
+._8.diamond {
+  background-position: -1001px -601px;
+}
+
+._9.diamond {
+  background-position: -1143px -601px;
+}
+
+._10.diamond {
+  background-position: -1286px -601px;
+}
+
+._J.diamond {
+  background-position: -1429px -601px;
+}
+
+._Q.diamond {
+  background-position: -1573px -601px;
+}
+
+._K.diamond {
+  background-position: -1716px -601px;
+}
+
+._A.club {
+  background-position: -1px -1px;
+}
+
+._2.club {
+  background-position: -144px -1px;
+}
+
+._3.club {
+  background-position: -287px -1px;
+}
+
+._4.club {
+  background-position: -430px -1px;
+}
+
+._5.club {
+  background-position: -572px -1px;
+}
+
+._6.club {
+  background-position: -715px -1px;
+}
+
+._7.club {
+  background-position: -858px -1px;
+}
+
+._8.club {
+  background-position: -1001px -1px;
+}
+
+._9.club {
+  background-position: -1143px -1px;
+}
+
+._10.club {
+  background-position: -1286px -1px;
+}
+
+._J.club {
+  background-position: -1429px -1px;
+}
+
+._Q.club {
+  background-position: -1573px -1px;
+}
+
+._K.club {
+  background-position: -1716px -1px;
+}

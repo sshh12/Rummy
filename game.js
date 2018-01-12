@@ -1,23 +1,25 @@
+const Lobby = require('./lobby');
+
 module.exports = class Game {
 
   constructor(wss) {
 
     this.wss = wss;
-    this.lobbys = {
-      'abc12': { isWaiting: true },
-      '12345': { isWaiting: false }
-    };
+    this.lobbys = {};
 
     wss.on('connection', (ws, req) => {
 
       ws.on('message', (message) => {
 
-        console.log(message);
-
         let data = JSON.parse(message);
 
+        console.log(data);
+
         if(data.cmd == 'status') {
-          this._retrieve_status(ws, data);
+          this._send(ws, {
+            cmd: 'status',
+            status: this._retrieve_status(data.lobby)
+          });
         }
 
       });
@@ -30,34 +32,35 @@ module.exports = class Game {
     ws.send(JSON.stringify(data));
   }
 
-  _retrieve_status(ws, data) {
-
-    let code = data.lobby;
+  _retrieve_status(code) {
 
     if(/^\w{5}$/.test(code)) {
 
       let lobby = this.lobbys[code];
 
-      if(lobby) {
-
-        if(lobby.isWaiting){
-          this._send(ws, {
-            cmd: 'status',
-            status: 'waiting'
-          });
-        } else {
-          this._send(ws, {
-            cmd: 'status',
-            status: 'playing'
-          });
-        }
+      if(lobby && lobby.isWaiting) {
+        return 'waiting';
       } else {
-        this._send(ws, {
-          cmd: 'status',
-          status: 'open'
-        });
+        return 'open';
       }
 
+    }
+
+    return 'closed';
+
+  }
+
+  addLobby(code) {
+
+    let status = this._retrieve_status(code);
+
+    if(status == 'waiting') {
+      return true;
+    } else if(status == 'open') {
+      this.lobbys[code] = new Lobby();
+      return true;
+    } else {
+      return false;
     }
 
   }

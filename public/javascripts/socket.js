@@ -1,6 +1,8 @@
 
 var socket = new WebSocket("ws://127.0.0.1:5000");
 
+let socketHandlers = {};
+
 socket.onopen = (event) => {
 
   console.log("Connected.");
@@ -12,19 +14,13 @@ socket.onopen = (event) => {
 };
 
 socket.onmessage = (message) => {
-  console.log(JSON.parse(message.data));
-  socket.ondata(JSON.parse(message.data));
+
+  let data = JSON.parse(message.data);
+  console.log(data);
+  socketHandlers[data.cmd](data);
+
 }
 
 let send = (data) => {
   socket.send(JSON.stringify(data));
 }
-
-let getLobbyStatus = (code) => {
-
-  send({
-    'cmd': 'status',
-    'lobby': code
-  });
-
-};
