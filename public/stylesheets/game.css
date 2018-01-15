@@ -21,7 +21,7 @@ body {
   transform: translateX(0px) translateY(0px) rotateZ(0deg);
 }
 
-.hidden {
+.unknown {
   background-position: -1862px -1px !important;
 }
 

@@ -7,7 +7,7 @@ module.exports = class Lobby {
     this.code = code;
     this.isWaiting = true;
     this.token = Crypto.randomBytes(22).toString('hex');
-    this.sockets = [];
+    this.sockets = [null, null];
     this._gen_cards();
 
   }
@@ -15,14 +15,21 @@ module.exports = class Lobby {
   handleData(ws, data) {
 
     if(data.cmd == 'join') {
-      if(!this.isWaiting || this.sockets == 2) {
+      if(!this.isWaiting || this.sockets.indexOf(null) == -1) {
         this._send(ws, {cmd: 'exit'});
       } else {
-        this.sockets.push(ws);
-        if(this.sockets.length == 2) {
+        this.sockets[this.sockets.indexOf(null)] = ws;
+        if(this.sockets.indexOf(null) == -1) {
           this.isWaiting = false;
         }
-        this._send(ws, {cmd: 'join', cards: this.playerCards[this.sockets.length - 1]});
+        this._send(ws, {
+          cmd: 'cards',
+          cards: this.playerCards[this.sockets.indexOf(ws)],
+          opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
+          deck: this.deck.length,
+          groups: this.groups,
+          drawPile: this.drawPile
+        });
       }
     }
 
@@ -57,6 +64,11 @@ module.exports = class Lobby {
       cards.splice(0, 10),
       cards.splice(0, 10)
     ];
+
+    this.drawPile = cards.splice(0, 1);
+    this.deck = cards;
+
+    this.groups = [];
 
     console.log(cards);
 
