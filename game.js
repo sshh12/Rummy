@@ -38,7 +38,7 @@ module.exports = class Game {
 
   _retrieve_status(code) {
 
-    if(/^\w{5}$/.test(code)) {
+    if(/^\w{5,12}$/.test(code)) {
 
       let lobby = this.lobbys[code];
 

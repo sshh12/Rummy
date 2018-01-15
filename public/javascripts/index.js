@@ -30,7 +30,7 @@ $('#code').on('keyup', () => {
 
   let code = "" + $('#code').val();
 
-  if(/^\w{5}$/.test(code)) {
+  if(/^\w{5,12}$/.test(code)) {
 
     $('#lobbybtn').removeClass('btn-default');
     $('#lobbybtn').removeClass('btn-info');
