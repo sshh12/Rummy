@@ -28,7 +28,7 @@ module.exports = class Lobby {
           opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
           deck: this.deck.length,
           groups: this.groups,
-          drawPile: this.drawPile
+          draw: this.draw
         });
       }
     }
@@ -65,10 +65,10 @@ module.exports = class Lobby {
       cards.splice(0, 10)
     ];
 
-    this.drawPile = cards.splice(0, 1);
-    this.deck = cards;
-
     this.groups = [];
+
+    this.draw = cards.splice(0, 1);
+    this.deck = cards;
 
     console.log(cards);
 

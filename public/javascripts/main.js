@@ -3,7 +3,9 @@ let code = params[4], token = params[5];
 
 let hand = [],
     ophand = [],
-    deck = [];
+    deck = [],
+    draw = [],
+    groups = [];
 
 let sendData = (data) => {
   data.lobby = code;
@@ -26,13 +28,26 @@ socketHandlers.cards = (data) => {
     hand.push(card);
   }
 
+  for(let card of data.draw) {
+    $("#cards").append(`<div class="card _${card.rank} ${card.suit}"></div>`);
+    draw.push(card);
+  }
+
+  for(let group of data.groups) {
+    for(let card of group) {
+      $("#cards").append(`<div class="card _${card.rank} ${card.suit}"></div>`);
+    }
+    groups.push(group);
+  }
+
   ophand = createFakeCards('ophand', data.opcards);
   deck = createFakeCards('deck', data.deck);
 
   renderHand(hand);
   renderHand(ophand, flip=true);
-
-  renderDeck(deck);
+  renderDeck(deck, left=true);
+  renderDeck(draw);
+  renderGroups(groups);
 
 }
 
@@ -83,14 +98,40 @@ let renderHand = (handCards, flip = false) => {
 
 }
 
-let renderDeck = (cards) => {
-  for(let i in deck) {
-    setCardPos(deck[i], $(window).width() / 2 - 70, $(window).height() / 2 - 99, i, 0);
+let renderDeck = (cards, left = false) => {
+
+  let offset = left ? $(window).width() / 2 - 200 : $(window).width() / 2 + 40;
+
+  for(let i in cards) {
+    setCardPos(cards[i], offset, $(window).height() / 2 - 99, i + 2, 0);
   }
+
+}
+
+let renderGroups = (groups) => {
+
+  let height = 10, offset = 10;
+
+  for(let i in groups) {
+
+    for(let j in groups[i]) {
+      setCardPos(groups[i][j], offset + j * 20, height, i + 2, 0);
+    }
+
+    height += 220;
+    if(height + 200 > $(window).height()) {
+      height = 10;
+      offset += 200;
+    }
+
+  }
+
 }
 
 $(window).on('resize', () => {
   renderHand(hand);
   renderHand(ophand, flip=true);
-  renderDeck(deck);
+  renderDeck(deck, left=true);
+  renderDeck(draw);
+  renderGroups(groups);
 })
