@@ -12,7 +12,7 @@ module.exports = class Lobby {
     this.choosePhase = true;
     this.turn = 0;
 
-    this._gen_cards();
+    this._genCards();
 
   }
 
@@ -48,20 +48,41 @@ module.exports = class Lobby {
 
       if(this.choosePhase) {
 
-        console.log(this._contains_card(this.draw, data));
-
         if(data.card == 'deck' && this.deck.length > 0) {
+
           let nextCard = this.deck.pop();
+          this.playerCards[playerIndex].push(nextCard);
+
           this._send(this.sockets[playerIndex], {cmd: 'draw', from: 'deck', player: 'me', card: nextCard});
           this._send(this.sockets[playerIndex ^ 1], {cmd: 'draw', from: 'deck', player: 'op'});
-        } else if(data.card != 'deck' && this._contains_card(this.draw, data) && this.draw.length > 0) {
+          this.choosePhase = false;
+
+        } else if(data.card != 'deck' && this._getCard(this.draw, data) != null && this.draw.length > 0) {
+
           let nextCard = this.draw.pop();
+          this.playerCards[playerIndex].push(nextCard);
+
           this._send(this.sockets[playerIndex], {cmd: 'draw', from: 'draw', player: 'me', card: nextCard});
           this._send(this.sockets[playerIndex ^ 1], {cmd: 'draw', from: 'draw', player: 'op'});
+          this.choosePhase = false;
+
         }
 
-        this.turn = this.turn ^ 1;
-        //this.choosePhase = false;
+      } else {
+
+        let card = this._getCard(this.playerCards[playerIndex], data);
+
+        if(card != null) {
+
+          this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
+          this.draw.push(card);
+
+          this._send(this.sockets[playerIndex], {cmd: 'discard', player: 'me', card: card});
+          this._send(this.sockets[playerIndex ^ 1], {cmd: 'discard', player: 'op', card: card});
+          this.choosePhase = true;
+          this.turn ^= 1;
+
+        }
 
       }
 
@@ -75,16 +96,16 @@ module.exports = class Lobby {
     }
   }
 
-  _contains_card(collection, targetCard) {
+  _getCard(collection, targetCard) {
     for(let card of collection) {
       if(card.suit == targetCard.suit && card.rank == targetCard.rank) {
-        return true;
+        return card;
       }
     }
-    return false;
+    return null;;
   }
 
-  _gen_cards() {
+  _genCards() {
 
     let cards = [];
 

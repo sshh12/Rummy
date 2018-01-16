@@ -44,6 +44,15 @@ let setClickHandle = () => {
 
 }
 
+let getCard = (collection, targetCard) => {
+  for(let card of collection) {
+    if(card.suit == targetCard.suit && card.rank == targetCard.rank) {
+      return card;
+    }
+  }
+  return null;;
+}
+
 socketHandlers.connected = (data) => {
   sendData({cmd: 'join'});
 }
@@ -104,7 +113,22 @@ socketHandlers.draw = (data) => {
     renderHand(ophand, flip=true);
   }
 
-  setClickHandle();
+}
+
+socketHandlers.discard = (data) => {
+
+  if(data.player == 'me') {
+    hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
+    draw.push(data.card);
+    renderHand(hand);
+    renderDeck(draw);
+  } else {
+    let nextCard = ophand.pop();
+    $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
+    draw.push(data.card);
+    renderHand(ophand, flip=true);
+    renderDeck(draw);
+  }
 
 }
 
