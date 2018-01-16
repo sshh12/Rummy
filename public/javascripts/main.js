@@ -13,6 +13,37 @@ let sendData = (data) => {
   send(data);
 }
 
+let setClickHandle = () => {
+
+  $('.card').on('click', function() {
+
+    let name = this.className;
+
+    if(name.includes('unknown')) {
+
+      if(name.includes('deck')) {
+        sendData({
+          cmd: 'click',
+          card: 'deck'
+        });
+      }
+
+    } else {
+
+      [_, rank, suit] = name.split(' ');
+      sendData({
+        cmd: 'click',
+        card: 'hand',
+        rank: rank.replace('_', ''),
+        suit: suit
+      });
+
+    }
+
+  });
+
+}
+
 socketHandlers.connected = (data) => {
   sendData({cmd: 'join'});
 }
@@ -48,6 +79,32 @@ socketHandlers.cards = (data) => {
   renderDeck(deck, left=true);
   renderDeck(draw);
   renderGroups(groups);
+
+  setClickHandle();
+
+}
+
+socketHandlers.draw = (data) => {
+
+  let nextCard = {};
+
+  if(data.from == 'deck') {
+    nextCard = deck.pop();
+  } else {
+    nextCard = draw.pop();
+  }
+
+  if(data.player == 'me') {
+    $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
+    hand.push(data.card);
+    renderHand(hand);
+  } else {
+    $(nextCard.html).attr('class', `card ophand fake_${ophand.length} unknown`);
+    ophand.push({html: `.card.fake_${ophand.length}.ophand`, suit: 'none', rank: 'none'});
+    renderHand(ophand, flip=true);
+  }
+
+  setClickHandle();
 
 }
 
