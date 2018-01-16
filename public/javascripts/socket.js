@@ -1,5 +1,4 @@
-
-var socket = new WebSocket("ws://127.0.0.1:5000");
+let socket = new WebSocket("ws://127.0.0.1:5000");
 
 let socketHandlers = {};
 
@@ -18,7 +17,7 @@ socket.onmessage = (message) => {
   let data = JSON.parse(message.data);
   console.log(data);
 
-  if(data.cmd in socketHandlers){
+  if (data.cmd in socketHandlers) {
     socketHandlers[data.cmd](data);
   }
 
