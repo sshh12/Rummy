@@ -37,6 +37,7 @@ $('#code').on('keyup', () => {
     $('#lobbybtn').removeClass('btn-danger');
     $('#lobbybtn').removeClass('btn-success');
     $('#lobbybtn').html('....');
+    $('#lobbybtn').on('click', () => { });
 
     send({
       'cmd': 'status',
@@ -50,6 +51,7 @@ $('#code').on('keyup', () => {
     $('#lobbybtn').removeClass('btn-success');
     $('#lobbybtn').addClass('btn-danger');
     $('#lobbybtn').html('Invalid');
+    $('#lobbybtn').on('click', () => { });
 
   }
 
