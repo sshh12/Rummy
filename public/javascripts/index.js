@@ -2,7 +2,7 @@ let joinGame = () => {
   window.location.href = "/join/" + $('#code').val();
 };
 
-socketHandlers.status = (data) => {
+handle.status = (data) => {
 
   if (data.cmd == 'status') {
     if (data.status == 'waiting') {
@@ -29,7 +29,7 @@ $('#code').on('keyup', () => {
 
   $('#lobbybtn').on('click', () => {});
 
-  let code = $('#code').val().replace(' ', '');
+  let code = $('#code').val().replace(/\W/, '');
 
   $('#code').val(code);
 
