@@ -52,6 +52,10 @@ let setClickHandle = () => {
     return false;
   })
 
+  $('body').on('contextmenu', function() {
+    return false;
+  })
+
 }
 
 let getCard = (collection, targetCard) => {
@@ -75,17 +79,17 @@ let sortDeck = (cards) => {
   });
 }
 
-socketHandlers.connected = (data) => {
+handle.connected = (data) => {
   sendData({
     cmd: 'join'
   });
 }
 
-socketHandlers.exit = (data) => {
+handle.exit = (data) => {
   window.location.href = "/";
 }
 
-socketHandlers.cards = (data) => {
+handle.cards = (data) => {
 
   for (let card of data.cards) {
     $("#cards").append(`<div class="card _${card.rank} ${card.suit}"></div>`);
@@ -117,7 +121,7 @@ socketHandlers.cards = (data) => {
 
 }
 
-socketHandlers.draw = (data) => {
+handle.draw = (data) => {
 
   let nextCard = {};
 
@@ -143,7 +147,7 @@ socketHandlers.draw = (data) => {
 
 }
 
-socketHandlers.discard = (data) => {
+handle.discard = (data) => {
 
   if (data.player == 'me') {
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
@@ -160,7 +164,7 @@ socketHandlers.discard = (data) => {
 
 }
 
-socketHandlers.newmeld = (data) => {
+handle.newmeld = (data) => {
 
   if (data.player == 'me') {
     for(let card of data.meld) {
@@ -181,7 +185,7 @@ socketHandlers.newmeld = (data) => {
 
 }
 
-socketHandlers.addmeld = (data) => {
+handle.addmeld = (data) => {
 
   if (data.player == 'me') {
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
@@ -194,7 +198,7 @@ socketHandlers.addmeld = (data) => {
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     melds[data.index].push(data.card);
     sortDeck(melds[data.index]);
-    renderHand(ophand, flip = true);
+    renderHand(ophand, flip=true);
     renderMelds(melds);
   }
 
@@ -279,7 +283,7 @@ let renderMelds = (melds) => {
     height += 220;
     if (height + 200 > $(window).height()) {
       height = 10;
-      offset += 200;
+      offset += 240;
     }
 
   }
@@ -288,8 +292,8 @@ let renderMelds = (melds) => {
 
 $(window).on('resize', () => {
   renderHand(hand);
-  renderHand(ophand, flip = true);
-  renderDeck(deck, left = true);
+  renderHand(ophand, flip=true);
+  renderDeck(deck, left=true);
   renderDeck(draw);
   renderMelds(melds);
 })

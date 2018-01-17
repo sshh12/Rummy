@@ -193,7 +193,7 @@ module.exports = class Lobby {
       } else {
          return a.suit - b.suit;
       }
-    })
+    });
   }
 
   _create_new_meld(cards, targetCard, rankIndex = null) {
@@ -241,19 +241,23 @@ module.exports = class Lobby {
 
       let meld = this.melds[i].slice(0);
 
-      if(meld[0].suit == targetCard.suit && meld[0].rank != meld[meld.length - 1].rank){
+      if(meld[0].rank != meld[meld.length - 1].rank){
 
-        let firstRankIndex = this.cardRanks.indexOf(meld[0].rank);
-        let lastRankIndex = this.cardRanks.indexOf(meld[meld.length - 1].rank);
+        if(meld[0].suit == targetCard.suit) {
 
-        if(firstRankIndex - 1 == index) {
-          meld.unshift(targetCard);
-          this._sortDeck(meld);
-          return {index: i, meld: meld};
-        } else if(lastRankIndex + 1 == index) {
-          meld.push(targetCard);
-          this._sortDeck(meld);
-          return {index: i, meld: meld};
+          let firstRankIndex = this.cardRanks.indexOf(meld[0].rank),
+              lastRankIndex = this.cardRanks.indexOf(meld[meld.length - 1].rank);
+
+          if(firstRankIndex - 1 == index) {
+            meld.unshift(targetCard);
+            this._sortDeck(meld);
+            return {index: i, meld: meld};
+          } else if(lastRankIndex + 1 == index) {
+            meld.push(targetCard);
+            this._sortDeck(meld);
+            return {index: i, meld: meld};
+          }
+
         }
 
       } else if(meld[0].rank == targetCard.rank) {

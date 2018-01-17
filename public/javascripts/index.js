@@ -29,7 +29,9 @@ $('#code').on('keyup', () => {
 
   $('#lobbybtn').on('click', () => {});
 
-  let code = "" + $('#code').val();
+  let code = $('#code').val().replace(' ', '');
+
+  $('#code').val(code);
 
   if (/^\w{5,12}$/.test(code)) {
 
