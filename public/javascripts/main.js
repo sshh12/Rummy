@@ -6,7 +6,7 @@ let hand = [],
     ophand = [],
     deck = [],
     draw = [],
-    groups = [];
+    melds = [];
 
 let sendData = (data) => {
   data.lobby = code;
@@ -16,15 +16,14 @@ let sendData = (data) => {
 
 let setClickHandle = () => {
 
-  $('.card').on('click', function() {
-
-    let name = this.className;
+  let sendClick = (name, left = true) => {
 
     if (name.includes('unknown')) {
 
       if (name.includes('deck')) {
         sendData({
           cmd: 'click',
+          button: left ? 'left' : 'right',
           card: 'deck'
         });
       }
@@ -34,6 +33,7 @@ let setClickHandle = () => {
       [_, rank, suit] = name.split(' ');
       sendData({
         cmd: 'click',
+        button: left ? 'left' : 'right',
         card: 'hand',
         rank: rank.replace('_', ''),
         suit: suit
@@ -41,7 +41,16 @@ let setClickHandle = () => {
 
     }
 
+  }
+
+  $('.card').on('click', function() {
+    sendClick(this.className, left=true);
   });
+
+  $('.card').on('contextmenu', function() {
+    sendClick(this.className, left=false);
+    return false;
+  })
 
 }
 
@@ -52,6 +61,18 @@ let getCard = (collection, targetCard) => {
     }
   }
   return null;;
+}
+
+let cardRanks = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+let sortDeck = (cards) => {
+  cards.sort((a, b) => {
+    if (a.rank != b.rank) {
+       return cardRanks.indexOf(a.rank) - cardRanks.indexOf(b.rank);
+    } else {
+       return a.suit - b.suit;
+    }
+  });
 }
 
 socketHandlers.connected = (data) => {
@@ -76,11 +97,11 @@ socketHandlers.cards = (data) => {
     draw.push(card);
   }
 
-  for (let group of data.groups) {
-    for (let card of group) {
+  for (let meld of data.melds) {
+    for (let card of meld) {
       $("#cards").append(`<div class="card _${card.rank} ${card.suit}"></div>`);
     }
-    groups.push(group);
+    melds.push(meld);
   }
 
   ophand = createFakeCards('ophand', data.opcards);
@@ -90,7 +111,7 @@ socketHandlers.cards = (data) => {
   renderHand(ophand, flip = true);
   renderDeck(deck, left = true);
   renderDeck(draw);
-  renderGroups(groups);
+  renderMelds(melds);
 
   setClickHandle();
 
@@ -139,6 +160,46 @@ socketHandlers.discard = (data) => {
 
 }
 
+socketHandlers.newmeld = (data) => {
+
+  if (data.player == 'me') {
+    for(let card of data.meld) {
+      hand.splice(hand.indexOf(getCard(hand, card)), 1);
+    }
+    melds.push(data.meld);
+    renderHand(hand);
+    renderMelds(melds);
+  } else {
+    for(let card of data.meld) {
+      let nextCard = ophand.pop();
+      $(nextCard.html).attr('class', `card _${card.rank} ${card.suit}`);
+    }
+    melds.push(data.meld);
+    renderHand(ophand, flip = true);
+    renderMelds(melds);
+  }
+
+}
+
+socketHandlers.addmeld = (data) => {
+
+  if (data.player == 'me') {
+    hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
+    melds[data.index].push(data.card);
+    sortDeck(melds[data.index]);
+    renderHand(hand);
+    renderMelds(melds);
+  } else {
+    let nextCard = ophand.pop();
+    $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
+    melds[data.index].push(data.card);
+    sortDeck(melds[data.index]);
+    renderHand(ophand, flip = true);
+    renderMelds(melds);
+  }
+
+}
+
 let createFakeCards = (name, n) => {
   let cards = [];
   for (let i = 0; i < n; i++) {
@@ -164,6 +225,8 @@ let setCardPos = (card, x, y, z = 2, degs = 0) => {
 
 let renderHand = (handCards, flip = false) => {
 
+  if(!flip) { sortDeck(handCards) };
+
   let height = flip ? 20 : $(window).height() - 250;
   let dangle = flip ? 4 : -4;
 
@@ -176,15 +239,15 @@ let renderHand = (handCards, flip = false) => {
   if (handCards.length % 2 == 1) {
     leftIndex = half - 1;
     rightIndex = half + 1;
-    setCardPos(handCards[half], $(window).width() / 2 - 70, height, half, 0);
+    setCardPos(handCards[half], $(window).width() / 2 - 75, height, half + 100, 0);
   } else {
     leftIndex = half - 1;
     rightIndex = half;
   }
 
   while (leftIndex >= 0) {
-    setCardPos(handCards[leftIndex], offset + leftIndex * 20, height, leftIndex, i * dangle);
-    setCardPos(handCards[rightIndex], offset + rightIndex * 20, height, rightIndex, i * -dangle);
+    setCardPos(handCards[leftIndex], offset + leftIndex * 20, height, leftIndex + 100, i * dangle);
+    setCardPos(handCards[rightIndex], offset + rightIndex * 20, height, rightIndex + 100, i * -dangle);
     leftIndex--;
     rightIndex++;
     i++;
@@ -202,15 +265,15 @@ let renderDeck = (cards, left = false) => {
 
 }
 
-let renderGroups = (groups) => {
+let renderMelds = (melds) => {
 
   let height = 10,
-    offset = 10;
+      offset = 10;
 
-  for (let i in groups) {
+  for (let i in melds) {
 
-    for (let j in groups[i]) {
-      setCardPos(groups[i][j], offset + j * 20, height, i + 2, 0);
+    for (let j in melds[i]) {
+      setCardPos(melds[i][j], offset + j * 20, height, i + j + 1000, 0);
     }
 
     height += 220;
@@ -228,5 +291,5 @@ $(window).on('resize', () => {
   renderHand(ophand, flip = true);
   renderDeck(deck, left = true);
   renderDeck(draw);
-  renderGroups(groups);
+  renderMelds(melds);
 })

@@ -17,8 +17,6 @@ module.exports = class Game {
 
         let data = JSON.parse(message);
 
-        console.log(data);
-
         if (data.cmd == 'status') {
           this._send(ws, {
             cmd: 'status',
