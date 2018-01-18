@@ -27,7 +27,7 @@ handle.status = (data) => {
 
 $('#code').on('keyup', () => {
 
-  $('#lobbybtn').on('click', () => {});
+  $('#lobbybtn').unbind('click');
 
   let code = $('#code').val().replace(/\W/, '');
 
