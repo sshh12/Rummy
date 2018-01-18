@@ -92,7 +92,7 @@ handle.exit = (data) => {
 handle.cards = (data) => {
 
   for (let card of data.cards) {
-    $("#cards").append(`<div class="card _${card.rank} ${card.suit}"></div>`);
+    $("#cards").append(`<div class="card _${card.rank} ${card.suit} myhand"></div>`);
     hand.push(card);
   }
 
@@ -132,7 +132,7 @@ handle.draw = (data) => {
   }
 
   if (data.player == 'me') {
-    $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
+    $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit} myhand`);
     hand.push(data.card);
     renderHand(hand);
   } else {
@@ -142,7 +142,7 @@ handle.draw = (data) => {
       suit: 'none',
       rank: 'none'
     });
-    renderHand(ophand, flip = true);
+    renderHand(ophand, flip=true);
   }
 
 }
@@ -154,12 +154,14 @@ handle.discard = (data) => {
     draw.push(data.card);
     renderHand(hand);
     renderDeck(draw);
+    setGlow($('.ophand'), 15, '#fa001e');
   } else {
     let nextCard = ophand.pop();
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     draw.push(data.card);
     renderHand(ophand, flip=true);
     renderDeck(draw);
+    setGlow($('.myhand'), 15, '#005bf9');
   }
 
 }
@@ -222,6 +224,14 @@ let setCardPos = (card, x, y, z = 2, degs = 0) => {
     'WebkitTransform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
     'msTransform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
     'z-index': z
+  });
+}
+
+let setGlow = (selector, amt, color) => {
+  selector.css({
+    '-moz-box-shadow': `0 0 ${amt}px ${color}`,
+    '-webkit-box-shadow': `0 0 ${amt}px ${color}`,
+    'box-shadow': `0px 0px ${amt}px ${color}`
   });
 }
 
