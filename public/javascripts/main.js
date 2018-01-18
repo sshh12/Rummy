@@ -158,7 +158,7 @@ handle.discard = (data) => {
     let nextCard = ophand.pop();
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     draw.push(data.card);
-    renderHand(ophand, flip = true);
+    renderHand(ophand, flip=true);
     renderDeck(draw);
   }
 
@@ -179,7 +179,7 @@ handle.newmeld = (data) => {
       $(nextCard.html).attr('class', `card _${card.rank} ${card.suit}`);
     }
     melds.push(data.meld);
-    renderHand(ophand, flip = true);
+    renderHand(ophand, flip=true);
     renderMelds(melds);
   }
 
@@ -189,15 +189,13 @@ handle.addmeld = (data) => {
 
   if (data.player == 'me') {
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
-    melds[data.index].push(data.card);
-    sortDeck(melds[data.index]);
+    melds[data.index] = data.meld;
     renderHand(hand);
     renderMelds(melds);
   } else {
     let nextCard = ophand.pop();
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
-    melds[data.index].push(data.card);
-    sortDeck(melds[data.index]);
+    melds[data.index] = data.meld;
     renderHand(ophand, flip=true);
     renderMelds(melds);
   }

@@ -18,31 +18,11 @@ module.exports = class Lobby {
 
   handleData(ws, data) {
 
+    this._ensure_players();
+
     if (data.cmd == 'join') {
 
-      if (!this.isWaiting || this.sockets.indexOf(null) == -1) {
-
-        this._send(ws, {
-          cmd: 'exit'
-        });
-
-      } else {
-
-        this.sockets[this.sockets.indexOf(null)] = ws;
-        if (this.sockets.indexOf(null) == -1) {
-          this.isWaiting = false;
-        }
-
-        this._send(ws, {
-          cmd: 'cards',
-          cards: this.playerCards[this.sockets.indexOf(ws)],
-          opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
-          deck: this.deck.length,
-          melds: this.melds,
-          draw: this.draw
-        });
-
-      }
+      this._process_join(ws);
 
     } else if (data.cmd == 'click' && this.sockets.indexOf(ws) == this.turn) {
 
@@ -50,43 +30,7 @@ module.exports = class Lobby {
 
       if (this.choosePhase) {
 
-        if (data.button == 'left' && data.card == 'deck' && this.deck.length > 0) {
-
-          let nextCard = this.deck.pop();
-          this.playerCards[playerIndex].push(nextCard);
-
-          this._send(this.sockets[playerIndex], {
-            cmd: 'draw',
-            from: 'deck',
-            player: 'me',
-            card: nextCard
-          });
-          this._send(this.sockets[playerIndex ^ 1], {
-            cmd: 'draw',
-            from: 'deck',
-            player: 'op'
-          });
-          this.choosePhase = false;
-
-        } else if (data.button == 'left' && data.card != 'deck' && this._getCard(this.draw, data) != null && this.draw.length > 0) {
-
-          let nextCard = this.draw.pop();
-          this.playerCards[playerIndex].push(nextCard);
-
-          this._send(this.sockets[playerIndex], {
-            cmd: 'draw',
-            from: 'draw',
-            player: 'me',
-            card: nextCard
-          });
-          this._send(this.sockets[playerIndex ^ 1], {
-            cmd: 'draw',
-            from: 'draw',
-            player: 'op'
-          });
-          this.choosePhase = false;
-
-        }
+        this._process_choose_phase(playerIndex, data);
 
       } else {
 
@@ -96,70 +40,11 @@ module.exports = class Lobby {
 
           if(data.button == 'left') {
 
-            this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
-            this.draw.push(card);
-
-            this._send(this.sockets[playerIndex], {
-              cmd: 'discard',
-              player: 'me',
-              card: card
-            });
-            this._send(this.sockets[playerIndex ^ 1], {
-              cmd: 'discard',
-              player: 'op',
-              card: card
-            });
-            this.choosePhase = true;
-            this.turn ^= 1;
+            this._process_discard(playerIndex, card);
 
           } else {
 
-            let newMeld = this._create_new_meld(this.playerCards[playerIndex], card);
-
-            if(newMeld.length >= 3) {
-
-              this._sortDeck(newMeld);
-
-              for(let card of newMeld) {
-                this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
-              }
-              this.melds.push(newMeld);
-
-              this._send(this.sockets[playerIndex], {
-                cmd: 'newmeld',
-                player: 'me',
-                meld: newMeld
-              });
-              this._send(this.sockets[playerIndex ^ 1], {
-                cmd: 'newmeld',
-                player: 'op',
-                meld: newMeld
-              });
-
-            } else {
-
-              let meld = this._create_similar_meld(card);
-              if(meld.index >= 0) {
-
-                this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
-                this.melds[meld.index] = meld.meld;
-
-                this._send(this.sockets[playerIndex], {
-                  cmd: 'addmeld',
-                  player: 'me',
-                  index: meld.index,
-                  card: card
-                });
-                this._send(this.sockets[playerIndex ^ 1], {
-                  cmd: 'addmeld',
-                  player: 'op',
-                  index: meld.index,
-                  card: card
-                });
-
-              }
-
-            }
+            this._process_meld(playerIndex, card);
 
           }
 
@@ -194,6 +79,168 @@ module.exports = class Lobby {
          return a.suit - b.suit;
       }
     });
+  }
+
+  _ensure_players() {
+
+    for(let i = 0; i < this.sockets.length; i++) {
+
+      if(this.sockets[i] != null) {
+
+        try {
+          this._send(this.sockets[i], {cmd: 'ping'});
+        } catch (e) {
+          this.isWaiting = true;
+          this.sockets[i] = null;
+        }
+
+      }
+
+    }
+
+  }
+
+  _process_join(ws) {
+
+    if (!this.isWaiting || this.sockets.indexOf(null) == -1) {
+
+      this._send(ws, {
+        cmd: 'exit'
+      });
+
+    } else {
+
+      this.sockets[this.sockets.indexOf(null)] = ws;
+      if (this.sockets.indexOf(null) == -1) {
+        this.isWaiting = false;
+      }
+
+      this._send(ws, {
+        cmd: 'cards',
+        cards: this.playerCards[this.sockets.indexOf(ws)],
+        opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
+        deck: this.deck.length,
+        melds: this.melds,
+        draw: this.draw
+      });
+
+    }
+
+  }
+
+  _process_choose_phase(playerIndex, data) {
+
+    if (data.button == 'left' && data.card == 'deck' && this.deck.length > 0) {
+
+      let nextCard = this.deck.pop();
+      this.playerCards[playerIndex].push(nextCard);
+
+      this._send(this.sockets[playerIndex], {
+        cmd: 'draw',
+        from: 'deck',
+        player: 'me',
+        card: nextCard
+      });
+      this._send(this.sockets[playerIndex ^ 1], {
+        cmd: 'draw',
+        from: 'deck',
+        player: 'op'
+      });
+      this.choosePhase = false;
+
+    } else if (data.button == 'left' && data.card != 'deck' && this._getCard(this.draw, data) != null && this.draw.length > 0) {
+
+      let nextCard = this.draw.pop();
+      this.playerCards[playerIndex].push(nextCard);
+
+      this._send(this.sockets[playerIndex], {
+        cmd: 'draw',
+        from: 'draw',
+        player: 'me',
+        card: nextCard
+      });
+      this._send(this.sockets[playerIndex ^ 1], {
+        cmd: 'draw',
+        from: 'draw',
+        player: 'op'
+      });
+      this.choosePhase = false;
+
+    }
+
+  }
+
+  _process_discard(playerIndex, card) {
+
+    this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
+    this.draw.push(card);
+
+    this._send(this.sockets[playerIndex], {
+      cmd: 'discard',
+      player: 'me',
+      card: card
+    });
+    this._send(this.sockets[playerIndex ^ 1], {
+      cmd: 'discard',
+      player: 'op',
+      card: card
+    });
+    this.choosePhase = true;
+    this.turn ^= 1;
+
+  }
+
+  _process_meld(playerIndex, card) {
+
+    let newMeld = this._create_new_meld(this.playerCards[playerIndex], card);
+
+    if(newMeld.length >= 3) {
+
+      this._sortDeck(newMeld);
+
+      for(let card of newMeld) {
+        this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
+      }
+      this.melds.push(newMeld);
+
+      this._send(this.sockets[playerIndex], {
+        cmd: 'newmeld',
+        player: 'me',
+        meld: newMeld
+      });
+      this._send(this.sockets[playerIndex ^ 1], {
+        cmd: 'newmeld',
+        player: 'op',
+        meld: newMeld
+      });
+
+    } else {
+
+      let meld = this._create_similar_meld(card);
+      if(meld.index >= 0) {
+
+        this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
+        this.melds[meld.index] = meld.meld;
+
+        this._send(this.sockets[playerIndex], {
+          cmd: 'addmeld',
+          player: 'me',
+          index: meld.index,
+          card: card,
+          meld: meld.meld
+        });
+        this._send(this.sockets[playerIndex ^ 1], {
+          cmd: 'addmeld',
+          player: 'op',
+          index: meld.index,
+          card: card,
+          meld: meld.meld
+        });
+
+      }
+
+    }
+
   }
 
   _create_new_meld(cards, targetCard, rankIndex = null) {
@@ -248,13 +295,11 @@ module.exports = class Lobby {
           let firstRankIndex = this.cardRanks.indexOf(meld[0].rank),
               lastRankIndex = this.cardRanks.indexOf(meld[meld.length - 1].rank);
 
-          if(firstRankIndex - 1 == index) {
+          if(firstRankIndex - 1 == index || (meld[0].rank == 'A' && index == 13)) {
             meld.unshift(targetCard);
-            this._sortDeck(meld);
             return {index: i, meld: meld};
-          } else if(lastRankIndex + 1 == index) {
+          } else if(lastRankIndex + 1 == index && meld[meld.length - 1].rank != 'A') {
             meld.push(targetCard);
-            this._sortDeck(meld);
             return {index: i, meld: meld};
           }
 
