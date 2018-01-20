@@ -112,10 +112,13 @@ handle.cards = (data) => {
   deck = createFakeCards('deck', data.deck);
 
   renderHand(hand);
-  renderHand(ophand, flip = true);
-  renderDeck(deck, left = true);
+  renderHand(ophand, flip=true);
+  renderDeck(deck, left=true);
   renderDeck(draw);
   renderMelds(melds);
+
+  setGlow($('.ophand'), 15, '#fa001e');
+  setGlow($('.myhand'), 15, '#005bf9');
 
   setClickHandle();
 
@@ -145,24 +148,29 @@ handle.draw = (data) => {
     renderHand(ophand, flip=true);
   }
 
+  setGlow($('.ophand'), 15, '#fa001e');
+  setGlow($('.myhand'), 15, '#005bf9');
+
 }
 
 handle.discard = (data) => {
 
   if (data.player == 'me') {
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
+    $(data.card.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     draw.push(data.card);
     renderHand(hand);
     renderDeck(draw);
-    setGlow($('.ophand'), 15, '#fa001e');
   } else {
     let nextCard = ophand.pop();
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     draw.push(data.card);
     renderHand(ophand, flip=true);
     renderDeck(draw);
-    setGlow($('.myhand'), 15, '#005bf9');
   }
+
+  setGlow($('.ophand'), 15, '#fa001e');
+  setGlow($('.myhand'), 15, '#005bf9');
 
 }
 

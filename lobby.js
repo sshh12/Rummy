@@ -247,7 +247,7 @@ module.exports = class Lobby {
 
     let isCard = (deck, index) => this._getCard(deck, {suit: targetCard.suit, rank: this.cardRanks[index]}) != null;
 
-    let suitMeld = [targetCard]
+    let suitMeld = [targetCard];
 
     let index = rankIndex || this.cardRanks.indexOf(targetCard.rank),
         lowerIndex = index - 1,
