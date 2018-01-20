@@ -58,14 +58,14 @@ module.exports = class Game {
     return this.lobbys[data.lobby] && this.lobbys[data.lobby].token == data.token;
   }
 
-  addLobby(code) {
+  addLobby(code, cpu = false) {
 
     let status = this._retrieve_status(code);
 
-    if (status == 'waiting') {
+    if (status == 'waiting' && !cpu) {
       return true;
     } else if (status == 'open') {
-      this.lobbys[code] = new Lobby();
+      this.lobbys[code] = new Lobby(code, cpu);
       return true;
     } else {
       return false;

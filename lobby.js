@@ -2,9 +2,10 @@ const Crypto = require("crypto");
 
 module.exports = class Lobby {
 
-  constructor(code) {
+  constructor(code, isCPU) {
 
     this.code = code;
+    this.cpu = isCPU;
     this.token = Crypto.randomBytes(22).toString('hex');
 
     this.sockets = [null, null];
@@ -83,15 +84,28 @@ module.exports = class Lobby {
 
   _ensure_players() {
 
-    for(let i = 0; i < this.sockets.length; i++) {
+    if(this.cpu) {
 
-      if(this.sockets[i] != null) {
+      try {
+        this._send(this.sockets[0], {cmd: 'ping'});
+      } catch (e) {
+        this.sockets[i] = null;
+        //EXIT
+      }
 
-        try {
-          this._send(this.sockets[i], {cmd: 'ping'});
-        } catch (e) {
-          this.isWaiting = true;
-          this.sockets[i] = null;
+    } else {
+
+      for(let i = 0; i < this.sockets.length; i++) {
+
+        if(this.sockets[i] != null) {
+
+          try {
+            this._send(this.sockets[i], {cmd: 'ping'});
+          } catch (e) {
+            this.isWaiting = true;
+            this.sockets[i] = null;
+          }
+
         }
 
       }
@@ -111,7 +125,7 @@ module.exports = class Lobby {
     } else {
 
       this.sockets[this.sockets.indexOf(null)] = ws;
-      if (this.sockets.indexOf(null) == -1) {
+      if (this.sockets.indexOf(null) == -1 || this.cpu) {
         this.isWaiting = false;
       }
 
@@ -121,7 +135,8 @@ module.exports = class Lobby {
         opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
         deck: this.deck.length,
         melds: this.melds,
-        draw: this.draw
+        draw: this.draw,
+        myturn: this.sockets.indexOf(ws) == this.turn
       });
 
     }
@@ -187,6 +202,10 @@ module.exports = class Lobby {
     });
     this.choosePhase = true;
     this.turn ^= 1;
+
+    if(this.turn == 1 && this.cpu) {
+      this._play_cpu_turn();
+    }
 
   }
 
@@ -363,6 +382,38 @@ module.exports = class Lobby {
 
     this.draw = cards.splice(0, 1);
     this.deck = cards;
+
+  }
+
+  _play_cpu_turn() {
+
+    let drawFromDeck = Math.random() > .5 || this.draw.length == 0;
+    let data = {cmd: 'click', button: 'left'};
+    let cpuCards = this.playerCards[1];
+
+    if(drawFromDeck) {
+      data.card = 'deck';
+    } else {
+      let card = this.draw[this.draw.length - 1];
+      data.card = 'hand';
+      data.rank = card.rank;
+      data.suit = card.suit;
+    }
+
+    setTimeout(() => {
+      this._process_choose_phase(1, data);
+    }, 800);
+
+    setTimeout(() => {
+      for(let card of cpuCards) {
+        this._process_meld(1, card);
+      }
+    }, 2000);
+
+    setTimeout(() => {
+      let discardCard = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      this._process_discard(1, discardCard);
+    }, 3000);
 
   }
 

@@ -25,7 +25,16 @@ app.get('/join/:lobby', function(req, res) {
   } else {
     res.redirect('/');
   }
-})
+});
+
+app.get('/joincpu/:lobby', function(req, res) {
+  let code = req.params.lobby;
+  if (rummy.addLobby(code, cpu=true)) {
+    res.redirect('/game/' + req.params.lobby + '/' + rummy.lobbys[code].token);
+  } else {
+    res.redirect('/');
+  }
+});
 
 app.get('/game/:lobby/:token', function(req, res) {
   let code = "" + req.params.lobby,
@@ -35,7 +44,7 @@ app.get('/game/:lobby/:token', function(req, res) {
   } else {
     res.redirect('/');
   }
-})
+});
 
 server.listen(5000, () => {
   console.log('Listening on port 5000...')

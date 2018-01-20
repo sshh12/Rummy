@@ -2,6 +2,10 @@ let joinGame = () => {
   window.location.href = "/join/" + $('#code').val();
 };
 
+let joinCPU = () => {
+  window.location.href = "/joincpu/" + $('#code').val();
+};
+
 handle.status = (data) => {
 
   if (data.cmd == 'status') {
@@ -14,8 +18,10 @@ handle.status = (data) => {
       $('#lobbybtn').html('Full');
     } else if (data.status == 'open') {
       $('#lobbybtn').attr('class', 'btn btn-info');
+      $('#cpubtn').css({ display: 'inline' });
       $('#lobbybtn').html('Create');
       $('#lobbybtn').on('click', () => joinGame());
+      $('#cpubtn').on('click', () => joinCPU());
     }
   }
 
@@ -24,6 +30,9 @@ handle.status = (data) => {
 $('#code').on('keyup', () => {
 
   $('#lobbybtn').unbind('click');
+  $('#cpubtn').unbind('click');
+
+  $('#cpubtn').css({ display: 'none' });
 
   let code = $('#code').val().replace(/\W/, '');
 
