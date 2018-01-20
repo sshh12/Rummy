@@ -65,12 +65,16 @@ module.exports = class Game {
     if (status == 'waiting' && !cpu) {
       return true;
     } else if (status == 'open') {
-      this.lobbys[code] = new Lobby(code, cpu);
+      this.lobbys[code] = new Lobby(code, this, cpu);
       return true;
     } else {
       return false;
     }
 
+  }
+
+  removeLobby(code) {
+    delete this.lobbys[code];
   }
 
 }

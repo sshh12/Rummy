@@ -2,10 +2,11 @@ const Crypto = require("crypto");
 
 module.exports = class Lobby {
 
-  constructor(code, isCPU) {
+  constructor(code, game, isCPU) {
 
     this.code = code;
     this.cpu = isCPU;
+    this.game = game;
     this.token = Crypto.randomBytes(22).toString('hex');
 
     this.sockets = [null, null];
@@ -13,11 +14,24 @@ module.exports = class Lobby {
     this.choosePhase = true;
     this.turn = 0;
 
+    this.selfDestruct = null;
+
     this._genCards();
 
   }
 
   handleData(ws, data) {
+
+    clearTimeout(this.selfDestruct);
+    this.selfDestruct = setTimeout(() => {
+      console.log("Removing Lobby", this.code)
+      for(let socket of this.sockets) {
+        if(socket != null) {
+          socket.terminate();
+        }
+      }
+      this.game.removeLobby(this.code);
+    }, 200 * 1000);
 
     this._ensure_players();
 
@@ -90,7 +104,6 @@ module.exports = class Lobby {
         this._send(this.sockets[0], {cmd: 'ping'});
       } catch (e) {
         this.sockets[i] = null;
-        //EXIT
       }
 
     } else {
