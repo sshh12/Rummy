@@ -1,12 +1,20 @@
 const express = require('express')
 const http = require('http');
+const https = require('https');
 const WebSocket = require('ws');
+const fs = require('fs');
 const Game = require('./game');
 
 const app = express();
 
+const sslOptions = {
+  cert: './fullchain.pem',
+  key: './privkey.pem'
+};
+
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const secureServer = https.createServer(sslOptions, app)
+const wss = new WebSocket.Server({ server: server });
 const rummy = new Game(wss);
 
 app.use(express.static('public'));
@@ -48,4 +56,7 @@ app.get('/game/:lobby/:token', function(req, res) {
 
 server.listen(5000, () => {
   console.log('Listening on port 5000...')
+});
+secureServer.listen(443, () => {
+  console.log('(Secure) Listening on port 443...')
 });
