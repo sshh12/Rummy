@@ -24,13 +24,7 @@ module.exports = class Lobby {
 
     clearTimeout(this.selfDestruct);
     this.selfDestruct = setTimeout(() => {
-      console.log("Removing Lobby", this.code)
-      for(let socket of this.sockets) {
-        if(socket != null) {
-          socket.terminate();
-        }
-      }
-      this.game.removeLobby(this.code);
+      this._doSelfDistruct();
     }, 200 * 1000);
 
     this._ensure_players();
@@ -96,6 +90,16 @@ module.exports = class Lobby {
     });
   }
 
+  _doSelfDistruct() {
+    console.log("Removing Lobby", this.code);
+    for(let socket of this.sockets) {
+      if(socket != null) {
+        socket.terminate();
+      }
+    }
+    this.game.removeLobby(this.code);
+  }
+
   _ensure_players() {
 
     if(this.cpu) {
@@ -103,7 +107,7 @@ module.exports = class Lobby {
       try {
         this._send(this.sockets[0], {cmd: 'ping'});
       } catch (e) {
-        this.sockets[i] = null;
+        this._doSelfDistruct();
       }
 
     } else {

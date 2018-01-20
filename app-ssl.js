@@ -8,13 +8,13 @@ const Game = require('./game');
 const app = express();
 
 const sslOptions = {
-  cert: './fullchain.pem',
-  key: './privkey.pem'
+  cert: fs.readFileSync('./fullchain.pem'),
+  key: fs.readFileSync('./privkey.pem')
 };
 
 const server = http.createServer(app);
 const secureServer = https.createServer(sslOptions, app)
-const wss = new WebSocket.Server({ server: server });
+const wss = new WebSocket.Server({ server: secureServer });
 const rummy = new Game(wss);
 
 app.use(express.static('public'));
