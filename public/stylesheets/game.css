@@ -1,5 +1,6 @@
 body {
   background-color: #252525 !important;
+  overflow: hidden;
 }
 
 .card {
