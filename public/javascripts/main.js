@@ -212,6 +212,21 @@ handle.addmeld = (data) => {
 
 }
 
+handle.win = (data) => {
+  $('#alert').attr('class', 'alert alert-success');
+  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p>Refresh the page to join a new lobby.</p>');
+  $('#alert').fadeToggle();
+  $('.card').unbind('click');
+  showConfetti();
+}
+
+handle.loss = (data) => {
+  $('#alert').attr('class', 'alert alert-danger');
+  $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p>Refresh the page to join a new lobby.</p>');
+  $('#alert').fadeToggle();
+  $('.card').unbind('click');
+}
+
 let createFakeCards = (name, n) => {
   let cards = [];
   for (let i = 0; i < n; i++) {
@@ -293,7 +308,7 @@ let renderMelds = (melds) => {
   for (let i in melds) {
 
     for (let j in melds[i]) {
-      setCardPos(melds[i][j], offset + j * 20, height, i + j + 1000, 0);
+      setCardPos(melds[i][j], offset + j * 20, height, i + j + 100, 0);
     }
 
     height += 220;

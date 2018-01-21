@@ -25,7 +25,7 @@ module.exports = class Lobby {
     clearTimeout(this.selfDestruct);
     this.selfDestruct = setTimeout(() => {
       this._doSelfDistruct();
-    }, 200 * 1000);
+    }, 300 * 1000);
 
     this._ensure_players();
 
@@ -56,6 +56,8 @@ module.exports = class Lobby {
             this._process_meld(playerIndex, card);
 
           }
+
+          this._check_win();
 
         }
 
@@ -129,6 +131,16 @@ module.exports = class Lobby {
 
     }
 
+  }
+
+  _check_win() {
+    for(let i = 0; i < this.playerCards.length; i++) {
+      if(this.playerCards[i].length == 0) {
+        this._send(this.sockets[i], {cmd: 'win'});
+        this._send(this.sockets[i ^ 1], {cmd: 'loss'});
+        break;
+      }
+    }
   }
 
   _process_join(ws) {

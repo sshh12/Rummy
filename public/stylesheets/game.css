@@ -3,6 +3,23 @@ body {
   overflow: hidden;
 }
 
+#cards {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#alert {
+  display: none;
+  z-index: 99999;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .card {
   background-image: url('../cards.png');
   -webkit-background-size: 2004px 800px;
