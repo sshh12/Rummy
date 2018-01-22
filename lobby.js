@@ -82,10 +82,19 @@ module.exports = class Lobby {
     return null;
   }
 
+  _getCardByValue(collection, suit, value) {
+    for (let card of collection) {
+      if (card.suit == suit && card.value == value) {
+        return card;
+      }
+    }
+    return null;
+  }
+
   _sortDeck(deck) {
     deck.sort((a, b) => {
       if (a.rank != b.rank){
-         return this.cardRanks.indexOf(a.rank) - this.cardRanks.indexOf(b.rank);
+         return a.value - b.value;
       } else {
          return a.suit - b.suit;
       }
@@ -291,28 +300,29 @@ module.exports = class Lobby {
 
   }
 
-  _create_new_meld(cards, targetCard, rankIndex = null) {
+  _create_new_meld(cards, targetCard) {
 
-    let isCard = (deck, index) => this._getCard(deck, {suit: targetCard.suit, rank: this.cardRanks[index]}) != null;
+    let isCard = (deck, suit, value) => this._getCardByValue(deck, suit, value) != null;
 
     let suitMeld = [targetCard];
 
-    let index = rankIndex || this.cardRanks.indexOf(targetCard.rank),
+    let index = targetCard.value,
         lowerIndex = index - 1,
         upperIndex = index + 1;
 
-    while(lowerIndex >= 0 && isCard(cards, lowerIndex)) {
+    while(lowerIndex >= 0 && isCard(cards, targetCard.suit, lowerIndex)) {
       suitMeld.unshift(this._getCard(cards, {suit: targetCard.suit, rank: this.cardRanks[lowerIndex]}));
       lowerIndex--;
     }
 
-    while(upperIndex < this.cardRanks.length && isCard(cards, upperIndex)) {
+    while(upperIndex < this.cardRanks.length && isCard(cards, targetCard.suit, upperIndex)) {
       suitMeld.push(this._getCard(cards, {suit: targetCard.suit, rank: this.cardRanks[upperIndex]}));
       upperIndex++;
     }
 
-    if(rankIndex == null && targetCard.rank == 'A') {
-      let otherMeld = this._create_new_meld(cards, targetCard, rankIndex=this.cardRanks.indexOf('A', 2));
+    if(targetCard.value == 0) {
+      targetCard.value = 14;
+      let otherMeld = this._create_new_meld(cards, targetCard);
       if(otherMeld.length > suitMeld.length) {
         suitMeld = otherMeld;
       }
@@ -328,9 +338,9 @@ module.exports = class Lobby {
 
   }
 
-  _create_similar_meld(targetCard, rankIndex = null) {
+  _create_similar_meld(targetCard) {
 
-    let index = rankIndex || this.cardRanks.indexOf(targetCard.length);
+    let index = targetCard.value;
 
     for(let i = 0; i < this.melds.length; i++) {
 
@@ -340,13 +350,13 @@ module.exports = class Lobby {
 
         if(meld[0].suit == targetCard.suit) {
 
-          let firstRankIndex = this.cardRanks.indexOf(meld[0].rank),
-              lastRankIndex = this.cardRanks.indexOf(meld[meld.length - 1].rank);
+          let firstRankIndex = meld[0].value,
+              lastRankIndex = meld[meld.length - 1].value;
 
-          if(firstRankIndex - 1 == index || (meld[0].rank == 'A' && index == 13)) {
+          if(firstRankIndex - 1 == index) {
             meld.unshift(targetCard);
             return {index: i, meld: meld};
-          } else if(lastRankIndex + 1 == index && meld[meld.length - 1].rank != 'A') {
+          } else if(lastRankIndex + 1 == index) {
             meld.push(targetCard);
             return {index: i, meld: meld};
           }
@@ -363,8 +373,9 @@ module.exports = class Lobby {
 
     }
 
-    if(rankIndex == null && targetCard.rank == 'A') {
-      return this._create_similar_meld(targetCard, rankIndex=this.cardRanks.indexOf('A', 2))
+    if(targetCard.value == 0) {
+      targetCard.value = 14;
+      return this._create_similar_meld(targetCard)
     }
 
     return {index: -1};
@@ -373,7 +384,7 @@ module.exports = class Lobby {
 
   _genCards() {
 
-    this.cardRanks = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    this.cardRanks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
     let cards = [];
 
@@ -383,7 +394,8 @@ module.exports = class Lobby {
         cards.push({
           html: `.card._${i}.${suit}`,
           suit: suit,
-          rank: "" + i
+          rank: "" + i,
+          value: this.cardRanks.indexOf("" + i)
         });
       }
 
@@ -391,7 +403,8 @@ module.exports = class Lobby {
         cards.push({
           html: `.card._${face}.${suit}`,
           suit: suit,
-          rank: face
+          rank: face,
+          value: this.cardRanks.indexOf(face)
         });
       }
 
@@ -416,11 +429,12 @@ module.exports = class Lobby {
 
   _play_cpu_turn() {
 
+    let cpuCards = this.playerCards[1];
+
     setTimeout(() => {
 
       let drawFromDeck = Math.random() > .5 || this.draw.length == 0;
       let data = {cmd: 'click', button: 'left'};
-      let cpuCards = this.playerCards[1];
 
       if(drawFromDeck) {
         data.card = 'deck';
