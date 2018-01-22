@@ -133,15 +133,17 @@ handle.addmeld = (data) => {
 
 handle.win = (data) => {
   $('#alert').attr('class', 'alert alert-success');
-  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p>Refresh the page to join a new lobby.</p>');
+  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p id="exitmsg">Exiting match in 10s...</p>');
   $('#alert').fadeToggle();
   $('.card').unbind('click');
   showConfetti();
+  beginLeave();
 }
 
 handle.loss = (data) => {
   $('#alert').attr('class', 'alert alert-danger');
-  $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p>Refresh the page to join a new lobby.</p>');
+  $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p id="exitmsg">Exiting match in 10s...</p>');
   $('#alert').fadeToggle();
   $('.card').unbind('click');
+  beginLeave();
 }

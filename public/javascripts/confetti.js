@@ -1,9 +1,11 @@
 
 let confettiContext = $('#confetti').get(0).getContext('2d');
+let confettiDimensions = {};
 
 let setConfettiCanvasSize = () => {
-  $('#confetti').width($(window).width());
-  $('#confetti').height($(window).height());
+  confettiDimensions = {width: $(window).width(), height: $(window).height()};
+  $('#confetti').width(confettiDimensions.width);
+  $('#confetti').height(confettiDimensions.height);
 };
 setConfettiCanvasSize();
 
@@ -15,8 +17,7 @@ let numConfetti = 2000,
 class Confetti {
 
   constructor() {
-    this.x = Math.random() * $(window).width();
-    this.y = Math.random() * $(window).height();
+    this.setPos();
     this.vx = Math.random() * 1.2 - .6;
     this.vy = Math.random() * 1 + 1;
     this.r = Math.random() * 2 + .1
@@ -26,6 +27,11 @@ class Confetti {
       b: Math.random() * 70 + 120,
       a: Math.random() * .5 + .5
     }
+  }
+
+  setPos() {
+    this.x = Math.random() * confettiDimensions.width;
+    this.y = Math.random() * confettiDimensions.height;
   }
 
   draw() {
@@ -39,12 +45,12 @@ class Confetti {
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    if(this.x > $(window).width()) {
-      this.x = 0;
+    if(this.x > confettiDimensions.width) {
+      this.setPos();
     } else if(this.x < 0) {
-      this.x = $(window).width();
+      this.setPos();
     }
-    if(this.y > $(window).height()) {
+    if(this.y > confettiDimensions.height) {
       this.y = 0;
     }
   }
@@ -52,6 +58,8 @@ class Confetti {
 }
 
 let showConfetti = () => {
+
+  $('#confetti').show();
 
   for(let i = 0; i < numConfetti; i++) {
     confetti.push(new Confetti());
@@ -63,11 +71,12 @@ let showConfetti = () => {
 
 let renderConfetti = () => {
 
-  confettiContext.clearRect(0, 0, $(window).width(), $(window).height());
+  confettiContext.clearRect(0, 0, confettiDimensions.width, confettiDimensions.height);
 
   for(let conf of confetti) {
     conf.draw();
   }
 
   requestAnimationFrame(renderConfetti);
+
 }

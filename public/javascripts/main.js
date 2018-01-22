@@ -92,6 +92,19 @@ let sortDeck = (cards) => {
   });
 }
 
+let beginLeave = () => {
+
+  window.secs = 10;
+
+  setInterval(() => {
+    if(window.secs == 0) {
+      window.location.href = "/";
+    }
+    $('#exitmsg').html(`Exiting match in ${window.secs--}s...`);
+  }, 1000);
+
+}
+
 $(window).on('resize', () => {
   renderHand(hand);
   renderHand(ophand, flip=true);

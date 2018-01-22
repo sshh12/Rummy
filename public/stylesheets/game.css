@@ -20,6 +20,10 @@ body {
   left: 0;
 }
 
+#confetti {
+  display: none;
+}
+
 .card {
   background-image: url('../cards.png');
   -webkit-background-size: 2004px 800px;
