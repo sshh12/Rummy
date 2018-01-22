@@ -1,6 +1,6 @@
 
-let setCardPos = (card, x, y, z = 2, degs = 0) => {
-  $(card.html).css({
+let setElementPos = (element, x, y, z = 2, degs = 0) => {
+  $(element.html).css({
     'transform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
     'MozTransform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
     'WebkitTransform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
@@ -33,15 +33,15 @@ let renderHand = (handCards, flip = false) => {
   if (handCards.length % 2 == 1) {
     leftIndex = half - 1;
     rightIndex = half + 1;
-    setCardPos(handCards[half], $(window).width() / 2 - 75, height, half + 100, 0);
+    setElementPos(handCards[half], $(window).width() / 2 - 75, height, half + 100, 0);
   } else {
     leftIndex = half - 1;
     rightIndex = half;
   }
 
   while (leftIndex >= 0) {
-    setCardPos(handCards[leftIndex], offset + leftIndex * 20, height, leftIndex + 100, i * dangle);
-    setCardPos(handCards[rightIndex], offset + rightIndex * 20, height, rightIndex + 100, i * -dangle);
+    setElementPos(handCards[leftIndex], offset + leftIndex * 20, height, leftIndex + 100, i * dangle);
+    setElementPos(handCards[rightIndex], offset + rightIndex * 20, height, rightIndex + 100, i * -dangle);
     leftIndex--;
     rightIndex++;
     i++;
@@ -54,7 +54,7 @@ let renderDeck = (cards, left = false) => {
   let offset = left ? $(window).width() / 2 - 200 : $(window).width() / 2 + 40;
 
   for (let i in cards) {
-    setCardPos(cards[i], offset, $(window).height() / 2 - 99, i + 2, 0);
+    setElementPos(cards[i], offset, $(window).height() / 2 - 99, i + 2, 0);
   }
 
 }
@@ -67,7 +67,7 @@ let renderMelds = (melds) => {
   for (let i in melds) {
 
     for (let j in melds[i]) {
-      setCardPos(melds[i][j], offset + j * 20, height, i + j + 100, 0);
+      setElementPos(melds[i][j], offset + j * 20, height, i + j + 100, 0);
     }
 
     height += 220;
@@ -77,5 +77,11 @@ let renderMelds = (melds) => {
     }
 
   }
+
+}
+
+let renderHint = () => {
+
+  setElementPos({html: '#hints'}, $(window).width() - 200, 10, 9999);
 
 }

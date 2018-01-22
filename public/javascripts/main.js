@@ -111,4 +111,5 @@ $(window).on('resize', () => {
   renderDeck(deck, left=true);
   renderDeck(draw);
   renderMelds(melds);
+  renderHint();
 })

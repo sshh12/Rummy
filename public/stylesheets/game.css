@@ -24,6 +24,14 @@ body {
   display: none;
 }
 
+#hints {
+  color: #FAFAFA;
+  -webkit-transition: -webkit-transform .5s ease-out;
+  transition: -webkit-transform .5s ease-out;
+  transition: -ms-transform .5s ease-out;
+  transition: transform .5s ease-out;
+}
+
 .card {
   background-image: url('../cards.png');
   -webkit-background-size: 2004px 800px;

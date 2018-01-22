@@ -35,11 +35,18 @@ handle.cards = (data) => {
   renderDeck(deck, left=true);
   renderDeck(draw);
   renderMelds(melds);
+  renderHint();
 
   setGlow($('.ophand'), 15, '#fa001e');
   setGlow($('.myhand'), 15, '#005bf9');
 
   setClickHandle();
+
+  if(data.myturn) {
+    $('#hints').html('<h5>Left Click to select <br> a card from the middle</h5>');
+  } else {
+    $('#hints').html('<h5>Opponents Turn...</h5>');
+  }
 
 }
 
@@ -57,6 +64,7 @@ handle.draw = (data) => {
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit} myhand`);
     hand.push(data.card);
     renderHand(hand);
+    $('#hints').html('<h5>Right Click your hand <br> to create a meld or <br> Left Click to discard <br> a card and end your turn</h5>');
   } else {
     $(nextCard.html).attr('class', `card ophand fake_${ophand.length} unknown`);
     ophand.push({
@@ -80,6 +88,7 @@ handle.discard = (data) => {
     draw.push(data.card);
     renderHand(hand);
     renderDeck(draw);
+    $('#hints').html('<h5>Opponents Turn...</h5>');
   } else {
     let nextCard = ophand.pop();
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
@@ -133,7 +142,7 @@ handle.addmeld = (data) => {
 
 handle.win = (data) => {
   $('#alert').attr('class', 'alert alert-success');
-  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p id="exitmsg">Exiting match in 10s...</p>');
+  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p id="exitmsg"></p>');
   $('#alert').fadeToggle();
   $('.card').unbind('click');
   showConfetti();
@@ -142,7 +151,7 @@ handle.win = (data) => {
 
 handle.loss = (data) => {
   $('#alert').attr('class', 'alert alert-danger');
-  $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p id="exitmsg">Exiting match in 10s...</p>');
+  $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p id="exitmsg"></p>');
   $('#alert').fadeToggle();
   $('.card').unbind('click');
   beginLeave();
