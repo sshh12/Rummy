@@ -94,7 +94,7 @@ let sortDeck = (cards) => {
 
 let beginLeave = () => {
 
-  window.secs = 10;
+  window.secs = 60;
 
   setInterval(() => {
     if(window.secs == 0) {

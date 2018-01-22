@@ -142,7 +142,7 @@ handle.addmeld = (data) => {
 
 handle.win = (data) => {
   $('#alert').attr('class', 'alert alert-success');
-  $('#alert').html('<h4 class="alert-heading">You Won!</h4><p id="exitmsg"></p>');
+  $('#alert').html(`<h4 class="alert-heading">You Won! Score: ${data.score}</h4><p id="exitmsg"></p>`);
   $('#alert').fadeToggle();
   $('.card').unbind('click');
   showConfetti();

@@ -142,10 +142,30 @@ module.exports = class Lobby {
 
   }
 
+  _calculate_card_score(cards) {
+
+    let sum = 0;
+
+    for(let card of cards) {
+
+      if(card.rank == 'A') {
+        sum += 1;
+      } else if(card.rank == 'J' || card.rank == 'K' || card.rank == 'Q') {
+        sum += 10;
+      } else {
+        sum += card.value + 1;
+      }
+
+    }
+
+    return sum;
+
+  }
+
   _check_win() {
     for(let i = 0; i < this.playerCards.length; i++) {
       if(this.playerCards[i].length == 0) {
-        this._send(this.sockets[i], {cmd: 'win'});
+        this._send(this.sockets[i], {cmd: 'win', score: this._calculate_card_score(this.playerCards[i ^ 1])});
         this._send(this.sockets[i ^ 1], {cmd: 'loss'});
         break;
       }
