@@ -416,33 +416,40 @@ module.exports = class Lobby {
 
   _play_cpu_turn() {
 
-    let drawFromDeck = Math.random() > .5 || this.draw.length == 0;
-    let data = {cmd: 'click', button: 'left'};
-    let cpuCards = this.playerCards[1];
-
-    if(drawFromDeck) {
-      data.card = 'deck';
-    } else {
-      let card = this.draw[this.draw.length - 1];
-      data.card = 'hand';
-      data.rank = card.rank;
-      data.suit = card.suit;
-    }
-
     setTimeout(() => {
+
+      let drawFromDeck = Math.random() > .5 || this.draw.length == 0;
+      let data = {cmd: 'click', button: 'left'};
+      let cpuCards = this.playerCards[1];
+
+      if(drawFromDeck) {
+        data.card = 'deck';
+      } else {
+        let card = this.draw[this.draw.length - 1];
+        data.card = 'hand';
+        data.rank = card.rank;
+        data.suit = card.suit;
+      }
+
       this._process_choose_phase(1, data);
-    }, 800);
+
+    }, 600);
 
     setTimeout(() => {
+
       for(let card of cpuCards) {
         this._process_meld(1, card);
       }
-    }, 2000);
+
+    }, 1800);
 
     setTimeout(() => {
+
       let discardCard = cpuCards[Math.floor(Math.random() * cpuCards.length)];
       this._process_discard(1, discardCard);
-    }, 3000);
+      this._check_win();
+
+    }, 2200);
 
   }
 
