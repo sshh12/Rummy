@@ -64,7 +64,7 @@ let getCard = (collection, targetCard) => {
       return card;
     }
   }
-  return null;;
+  return null;
 }
 
 let createFakeCards = (name, n) => {
@@ -85,7 +85,7 @@ let cardRanks = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q
 let sortDeck = (cards) => {
   cards.sort((a, b) => {
     if (a.rank != b.rank) {
-       return a.value - b.value;
+       return a.rank - b.rank;
     } else {
        return a.suit - b.suit;
     }
