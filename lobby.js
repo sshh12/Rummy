@@ -167,6 +167,7 @@ module.exports = class Lobby {
       if(this.playerCards[i].length == 0) {
         this._send(this.sockets[i], {cmd: 'win', score: this._calculate_card_score(this.playerCards[i ^ 1])});
         this._send(this.sockets[i ^ 1], {cmd: 'loss'});
+        this._doSelfDistruct();
         break;
       }
     }
@@ -350,7 +351,7 @@ module.exports = class Lobby {
 
     let rankMeld = cards.filter((card) => card.rank == targetCard.rank);
 
-    if(rankMeld.length >= suitMeld.length) {
+    if(rankMeld.length > suitMeld.length) {
       return rankMeld;
     } else {
       return suitMeld;

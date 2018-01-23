@@ -9,11 +9,14 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const rummy = new Game(wss);
 
+// Serve Static Files/Assets
 app.use(express.static('public'));
 
+// Ignore Socket Errors
 wss.on('error', () => console.log('*errored*'));
 wss.on('close', () => console.log('*disconnected*'));
 
+/*----------------------ENDPOINTS----------------------*/
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -45,7 +48,9 @@ app.get('/game/:lobby/:token', (req, res) => {
     res.redirect('/');
   }
 });
+/*-----------------------------------------------------*/
 
+// Start Server
 server.listen(5000, () => {
   console.log('Listening on port 5000...')
 });
