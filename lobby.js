@@ -1,13 +1,21 @@
 const Crypto = require("crypto");
 
+// Exports Lobby Class
 module.exports = class Lobby {
 
+  /**
+   * Constructs a Game Instance
+   * @constructor
+   * @param {string} code - The lobby code
+   * @param {Game} game - The main Rummy Game
+   * @param {boolean} isCPU - If the game is vs bot
+   */
   constructor(code, game, isCPU) {
 
     this.code = code;
     this.cpu = isCPU;
     this.game = game;
-    this.token = Crypto.randomBytes(22).toString('hex');
+    this.token = Crypto.randomBytes(22).toString('hex'); // Generate random lobby code
 
     this.sockets = [null, null];
     this.isWaiting = true;
@@ -20,9 +28,14 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Main Method for Handling Data
+   * @param {WebSocket} ws - The clients websocket
+   * @param {Object} data - The data recieved
+   */
   handleData(ws, data) {
 
-    clearTimeout(this.selfDestruct);
+    clearTimeout(this.selfDestruct);  // Continue to postpone self destruct until no data is sent
     this.selfDestruct = setTimeout(() => {
       this._doSelfDistruct();
     }, 300 * 1000);
@@ -67,14 +80,25 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Sends Data to Client
+   * @param {WebSocket} ws - The clients websocket
+   * @param {Object} data - The data to send
+   */
   _send(ws, data) {
     if (ws !== null) {
       ws.send(JSON.stringify(data));
     }
   }
 
-  _getCard(collection, targetCard) {
-    for (let card of collection) {
+  /**
+   * Finds Card that Matches
+   * @param {Card[]} cards - A collection of cards
+   * @param {Card} targetCard - The query card
+   * @returns {?Card} A card from cards that matches targetCard
+   */
+  _getCard(cards, targetCard) {
+    for (let card of cards) {
       if (card.suit == targetCard.suit && card.rank == targetCard.rank) {
         return card;
       }
@@ -82,8 +106,15 @@ module.exports = class Lobby {
     return null;
   }
 
-  _getCardByValue(collection, suit, value) {
-    for (let card of collection) {
+  /**
+   * Finds Card that Matches
+   * @param {Card[]} cards - A collection of cards
+   * @param {string} suit - A card suit
+   * @param {number} value - A card value
+   * @returns {?Card} A card from cards that matches given inputs
+   */
+  _getCardByValue(cards, suit, value) {
+    for (let card of cards) {
       if (card.suit == suit && card.value == value) {
         return card;
       }
@@ -91,6 +122,10 @@ module.exports = class Lobby {
     return null;
   }
 
+  /**
+   * In-Place Sorts Cards
+   * @param {Card[]} deck - A collection of cards
+   */
   _sortDeck(deck) {
     deck.sort((a, b) => {
       if (a.rank != b.rank){
@@ -101,6 +136,9 @@ module.exports = class Lobby {
     });
   }
 
+  /**
+   * Destroys and Removes This Lobby
+   */
   _doSelfDistruct() {
     console.log("Removing Lobby", this.code);
     for(let socket of this.sockets) {
@@ -111,6 +149,9 @@ module.exports = class Lobby {
     this.game.removeLobby(this.code);
   }
 
+  /**
+   * Checks and Ensures Players (websockets) are Connected
+   */
   _ensure_players() {
 
     if(this.cpu) {
@@ -142,6 +183,11 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Calculates Card Score
+   * @param {Card[]} cards - Cards
+   * @returns {number} Total number of points from the cards
+   */
   _calculate_card_score(cards) {
 
     let sum = 0;
@@ -162,6 +208,9 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Checks If a Player Won and then Sends Win/Loss Data
+   */
   _check_win() {
     for(let i = 0; i < this.playerCards.length; i++) {
       if(this.playerCards[i].length == 0) {
@@ -173,6 +222,10 @@ module.exports = class Lobby {
     }
   }
 
+  /**
+   * Handles a Client Joining
+   * @param {WebSocket} ws - The client socket
+   */
   _process_join(ws) {
 
     if (!this.isWaiting || this.sockets.indexOf(null) == -1) {
@@ -202,6 +255,11 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Handles the Choose a Card Phase
+   * @param {number} playerIndex - The player choosing
+   * @param {Object} data - Data associated w/choice
+   */
   _process_choose_phase(playerIndex, data) {
 
     if (data.button == 'left' && data.card == 'deck' && this.deck.length > 0) {
@@ -244,6 +302,11 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Handles Discarding a Card
+   * @param {number} playerIndex - The player discarding
+   * @param {Card} card - The card being discarded
+   */
   _process_discard(playerIndex, card) {
 
     this.playerCards[playerIndex].splice(this.playerCards[playerIndex].indexOf(card), 1);
@@ -268,6 +331,11 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Handles Creating a Meld
+   * @param {number} playerIndex - The player attempting to meld
+   * @param {Card} card - The card to be melded
+   */
   _process_meld(playerIndex, card) {
 
     let newMeld = this._create_new_meld(this.playerCards[playerIndex], card);
@@ -321,12 +389,19 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Creates The Best Meld with Given Card
+   * @param {Card[]} cards - The player's cards
+   * @param {Card} targetCard - The card used to spawn a meld
+   * @returns {Card[]} A meld
+   */
   _create_new_meld(cards, targetCard) {
 
     let isCard = (deck, suit, value) => this._getCardByValue(deck, suit, value) != null;
 
     let suitMeld = [targetCard];
 
+    /*----------Finding Longest Sequence For Suit Meld-----------*/
     let index = targetCard.value,
         lowerIndex = index - 1,
         upperIndex = index + 1;
@@ -340,8 +415,9 @@ module.exports = class Lobby {
       suitMeld.push(this._getCard(cards, {suit: targetCard.suit, rank: this.cardRanks[upperIndex]}));
       upperIndex++;
     }
+    /*-----------------------------------------------------------*/
 
-    if(targetCard.value == 0) {
+    if(targetCard.value == 0) { // If it's an Ace try flipping its value
       targetCard.value = 14;
       let otherMeld = this._create_new_meld(cards, targetCard);
       if(otherMeld.length > suitMeld.length) {
@@ -351,7 +427,7 @@ module.exports = class Lobby {
 
     let rankMeld = cards.filter((card) => card.rank == targetCard.rank);
 
-    if(rankMeld.length > suitMeld.length) {
+    if(rankMeld.length > suitMeld.length) { // Prefer Suit Meld over a Rank Meld
       return rankMeld;
     } else {
       return suitMeld;
@@ -359,6 +435,11 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Appends a Meld with Given Card
+   * @param {Card} targetCard - The card to be melded
+   * @returns {Object} The index of the meld and the new meld itself
+   */
   _create_similar_meld(targetCard) {
 
     let index = targetCard.value;
@@ -367,24 +448,24 @@ module.exports = class Lobby {
 
       let meld = this.melds[i].slice(0);
 
-      if(meld[0].rank != meld[meld.length - 1].rank){
+      if(meld[0].rank != meld[meld.length - 1].rank){ // Suit Meld
 
         if(meld[0].suit == targetCard.suit) {
 
           let firstRankIndex = meld[0].value,
               lastRankIndex = meld[meld.length - 1].value;
 
-          if(firstRankIndex - 1 == index) {
+          if(firstRankIndex - 1 == index) { // Add to front
             meld.unshift(targetCard);
             return {index: i, meld: meld};
-          } else if(lastRankIndex + 1 == index) {
+          } else if(lastRankIndex + 1 == index) { // Add to back
             meld.push(targetCard);
             return {index: i, meld: meld};
           }
 
         }
 
-      } else if(meld[0].rank == targetCard.rank) {
+      } else if(meld[0].rank == targetCard.rank) { // Rank Meld
 
         meld.push(targetCard);
         this._sortDeck(meld);
@@ -394,7 +475,7 @@ module.exports = class Lobby {
 
     }
 
-    if(targetCard.value == 0) {
+    if(targetCard.value == 0) { // If it's an Ace try flipping its value
       targetCard.value = 14;
       return this._create_similar_meld(targetCard)
     }
@@ -403,6 +484,9 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Generates a Deck of Cards
+   */
   _genCards() {
 
     this.cardRanks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -448,13 +532,16 @@ module.exports = class Lobby {
 
   }
 
+  /**
+   * Plays a Turn as the CPU
+   */
   _play_cpu_turn() {
 
     let cpuCards = this.playerCards[1];
 
     setTimeout(() => {
 
-      let drawFromDeck = Math.random() > .5 || this.draw.length == 0;
+      let drawFromDeck = Math.random() > .5 || this.draw.length == 0; // Randomly picks where to draw from
       let data = {cmd: 'click', button: 'left'};
 
       if(drawFromDeck) {
@@ -472,7 +559,7 @@ module.exports = class Lobby {
 
     setTimeout(() => {
 
-      for(let card of cpuCards) {
+      for(let card of cpuCards) {  // Attempts to meld every card it has
         this._process_meld(1, card);
       }
 
@@ -480,7 +567,7 @@ module.exports = class Lobby {
 
     setTimeout(() => {
 
-      let discardCard = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      let discardCard = cpuCards[Math.floor(Math.random() * cpuCards.length)]; // Discard random card
       this._process_discard(1, discardCard);
       this._check_win();
 

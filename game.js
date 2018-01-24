@@ -82,7 +82,7 @@ module.exports = class Game {
   /**
    * Adds Lobby
    * @param {string} code - Lobby code
-   * @param {cpu} boolean - If the lobby should contain a CPU player
+   * @param {boolean} [cpu=false] - If the lobby should contain a CPU player
    * @returns {boolean} If lobby exists
    */
   addLobby(code, cpu = false) {
