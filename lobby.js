@@ -84,11 +84,18 @@ module.exports = class Lobby {
    * Sends Data to Client
    * @param {WebSocket} ws - The clients websocket
    * @param {Object} data - The data to send
+   * @returns {boolean} If data was sent
    */
   _send(ws, data) {
     if (ws !== null) {
-      ws.send(JSON.stringify(data));
+      try {
+        ws.send(JSON.stringify(data));
+        return true;
+      } catch (e) {
+        // oops..
+      }
     }
+    return false;
   }
 
   /**
@@ -228,7 +235,7 @@ module.exports = class Lobby {
    */
   _process_join(ws) {
 
-    if (!this.isWaiting || this.sockets.indexOf(null) == -1) {
+    if (!this.isWaiting || this.sockets.indexOf(null) == -1) { // If lobby full -> tell new client to leave
 
       this._send(ws, {
         cmd: 'exit'
@@ -236,12 +243,12 @@ module.exports = class Lobby {
 
     } else {
 
-      this.sockets[this.sockets.indexOf(null)] = ws;
+      this.sockets[this.sockets.indexOf(null)] = ws; // Add client to lobby via its Websocket
       if (this.sockets.indexOf(null) == -1 || this.cpu) {
         this.isWaiting = false;
       }
 
-      this._send(ws, {
+      this._send(ws, { // Send copy of current deck and layout to new client
         cmd: 'cards',
         cards: this.playerCards[this.sockets.indexOf(ws)],
         opcards: this.playerCards[this.sockets.indexOf(ws) ^ 1].length,
@@ -262,7 +269,7 @@ module.exports = class Lobby {
    */
   _process_choose_phase(playerIndex, data) {
 
-    if (data.button == 'left' && data.card == 'deck' && this.deck.length > 0) {
+    if (data.button == 'left' && data.card == 'deck' && this.deck.length > 0) { // Draw from deck
 
       let nextCard = this.deck.pop();
       this.playerCards[playerIndex].push(nextCard);
@@ -280,7 +287,7 @@ module.exports = class Lobby {
       });
       this.choosePhase = false;
 
-    } else if (data.button == 'left' && data.card != 'deck' && this._getCard(this.draw, data) != null && this.draw.length > 0) {
+    } else if (data.button == 'left' && data.card != 'deck' && this._getCard(this.draw, data) != null && this.draw.length > 0) { // Draw from pile
 
       let nextCard = this.draw.pop();
       this.playerCards[playerIndex].push(nextCard);
@@ -340,7 +347,7 @@ module.exports = class Lobby {
 
     let newMeld = this._create_new_meld(this.playerCards[playerIndex], card);
 
-    if(newMeld.length >= 3) {
+    if(newMeld.length >= 3) { //-> Create a new meld
 
       this._sortDeck(newMeld);
 
@@ -360,7 +367,7 @@ module.exports = class Lobby {
         meld: newMeld
       });
 
-    } else {
+    } else { //-> See if this card can be added to a meld
 
       let meld = this._create_similar_meld(card);
       if(meld.index >= 0) {
@@ -515,7 +522,7 @@ module.exports = class Lobby {
 
     }
 
-    for (let i = cards.length - 1; i > 0; i--) { // Shuffle
+    for (let i = cards.length - 1; i > 0; i--) { // Shuffle Cards
       const j = Math.floor(Math.random() * (i + 1));
       [cards[i], cards[j]] = [cards[j], cards[i]];
     }
@@ -539,7 +546,7 @@ module.exports = class Lobby {
 
     let cpuCards = this.playerCards[1];
 
-    setTimeout(() => {
+    setTimeout(() => { // Choose a card
 
       let drawFromDeck = Math.random() > .5 || this.draw.length == 0; // Randomly picks where to draw from
       let data = {cmd: 'click', button: 'left'};
@@ -557,7 +564,7 @@ module.exports = class Lobby {
 
     }, 600);
 
-    setTimeout(() => {
+    setTimeout(() => { // Meld cards
 
       for(let card of cpuCards) {  // Attempts to meld every card it has
         this._process_meld(1, card);
@@ -565,7 +572,7 @@ module.exports = class Lobby {
 
     }, 1800);
 
-    setTimeout(() => {
+    setTimeout(() => { // Discard a card
 
       let discardCard = cpuCards[Math.floor(Math.random() * cpuCards.length)]; // Discard random card
       this._process_discard(1, discardCard);

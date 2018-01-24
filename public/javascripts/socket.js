@@ -2,7 +2,7 @@
  * Socket Related Functions
  */
 
-let socket = new WebSocket(window.location.href.replace('http', 'ws'));
+let socket = new WebSocket(window.location.href.replace('http', 'ws')); // Connect to socket @ same url as page
 
 let handle = {}; // Store Handlers
 

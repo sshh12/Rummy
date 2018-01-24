@@ -100,6 +100,7 @@ handle.discard = (data) => { // Handle discard
     draw.push(data.card);
     renderHand(ophand, flip=true);
     renderDeck(draw);
+    $('#hints').html('<h5>Left Click to select <br> a card from the middle</h5>');
   }
 
   setGlow($('.ophand'), 15, '#fa001e');
