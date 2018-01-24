@@ -1,3 +1,6 @@
+/*
+ * This Creates a Snow/Confetti Animation
+ */
 
 let confettiContext = $('#confetti').get(0).getContext('2d');
 let confettiDimensions = {};
@@ -16,7 +19,7 @@ let numConfetti = 2000,
 
 class Confetti {
 
-  constructor() {
+  constructor() { // Create piece of confetti w/random properties
     this.setPos();
     this.vx = Math.random() * 1.2 - .6;
     this.vy = Math.random() * 1 + 1;
@@ -57,7 +60,7 @@ class Confetti {
 
 }
 
-let showConfetti = () => {
+let showConfetti = () => { // Displays confetti and starts animation
 
   $('#confetti').show();
 
@@ -69,7 +72,7 @@ let showConfetti = () => {
 
 }
 
-let renderConfetti = () => {
+let renderConfetti = () => { // Draws confetti
 
   confettiContext.clearRect(0, 0, confettiDimensions.width, confettiDimensions.height);
 

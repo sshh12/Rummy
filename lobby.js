@@ -548,7 +548,7 @@ module.exports = class Lobby {
         data.card = 'deck';
       } else {
         let card = this.draw[this.draw.length - 1];
-        data.card = 'hand';
+        data.card = 'notdeck';
         data.rank = card.rank;
         data.suit = card.suit;
       }

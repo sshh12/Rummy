@@ -32,6 +32,7 @@ body {
   transition: transform .5s ease-out;
 }
 
+/* Original Cards/Image @ http://www.rummytastic.com/ */
 .card {
   background-image: url('../cards.png');
   -webkit-background-size: 2004px 800px;

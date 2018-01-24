@@ -22,4 +22,4 @@ A online app for playing multiplayer Rummy.
 
 ## Screenshots
 
-```TODO```
+![gif of game](https://user-images.githubusercontent.com/6625384/35307951-e63e8362-006a-11e8-97a5-18361f151072.gif)

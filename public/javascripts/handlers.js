@@ -1,14 +1,18 @@
-handle.connected = (data) => {
+/*
+ * Handlers for Incoming Socket Data
+ */
+
+handle.connected = (data) => { // Handle join
   sendData({
     cmd: 'join'
   });
 }
 
-handle.exit = (data) => {
+handle.exit = (data) => { // Handle Exir
   window.location.href = "/";
 }
 
-handle.cards = (data) => {
+handle.cards = (data) => { // Handle initial cards/layout
 
   for (let card of data.cards) {
     $("#cards").append(`<div class="card _${card.rank} ${card.suit} myhand"></div>`);
@@ -27,6 +31,7 @@ handle.cards = (data) => {
     melds.push(meld);
   }
 
+  // Create fake cards to prevent cheating (by people who inspect element to see opponents cards)
   ophand = createFakeCards('ophand', data.opcards);
   deck = createFakeCards('deck', data.deck);
 
@@ -50,17 +55,17 @@ handle.cards = (data) => {
 
 }
 
-handle.draw = (data) => {
+handle.draw = (data) => { // Handle draw
 
   let nextCard = {};
 
-  if (data.from == 'deck') {
+  if (data.from == 'deck') { // Where From
     nextCard = deck.pop();
   } else {
     nextCard = draw.pop();
   }
 
-  if (data.player == 'me') {
+  if (data.player == 'me') { // Who
     $(nextCard.html).attr('class', `card _${data.card.rank} ${data.card.suit} myhand`);
     hand.push(data.card);
     renderHand(hand);
@@ -80,9 +85,9 @@ handle.draw = (data) => {
 
 }
 
-handle.discard = (data) => {
+handle.discard = (data) => { // Handle discard
 
-  if (data.player == 'me') {
+  if (data.player == 'me') { // Who
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
     $(data.card.html).attr('class', `card _${data.card.rank} ${data.card.suit}`);
     draw.push(data.card);
@@ -102,9 +107,9 @@ handle.discard = (data) => {
 
 }
 
-handle.newmeld = (data) => {
+handle.newmeld = (data) => { // Handles creation of a new meld
 
-  if (data.player == 'me') {
+  if (data.player == 'me') { // Who
     for(let card of data.meld) {
       hand.splice(hand.indexOf(getCard(hand, card)), 1);
     }
@@ -123,9 +128,9 @@ handle.newmeld = (data) => {
 
 }
 
-handle.addmeld = (data) => {
+handle.addmeld = (data) => { // Handles the edit of a previous meld
 
-  if (data.player == 'me') {
+  if (data.player == 'me') { // Who
     hand.splice(hand.indexOf(getCard(hand, data.card)), 1);
     melds[data.index] = data.meld;
     renderHand(hand);
@@ -140,7 +145,7 @@ handle.addmeld = (data) => {
 
 }
 
-handle.win = (data) => {
+handle.win = (data) => { // Handle win
   $('#alert').attr('class', 'alert alert-success');
   $('#alert').html(`<h4 class="alert-heading">You Won! Score: ${data.score}</h4><p id="exitmsg"></p>`);
   $('#alert').fadeToggle();
@@ -149,7 +154,7 @@ handle.win = (data) => {
   beginLeave();
 }
 
-handle.loss = (data) => {
+handle.loss = (data) => { // Handle loss
   $('#alert').attr('class', 'alert alert-danger');
   $('#alert').html('<h4 class="alert-heading">You Lost!</h4><p id="exitmsg"></p>');
   $('#alert').fadeToggle();

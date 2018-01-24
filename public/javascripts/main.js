@@ -1,20 +1,26 @@
-let params = window.location.href.split("/");
+/*
+ * The Main Script for Rummy Front-End
+ */
+
+let params = window.location.href.split("/"); // Extract Code and Token from URL
 let code = params[4],
     token = params[5];
 
+// Local Game Objects
+// Note: The server verifies their integrity to prevent Front-End tampering/cheating
 let hand = [],
     ophand = [],
     deck = [],
     draw = [],
     melds = [];
 
-let sendData = (data) => {
+let sendData = (data) => { // Sends data with token attached
   data.lobby = code;
   data.token = token;
   send(data);
 }
 
-let setClickHandle = () => {
+let setClickHandle = () => { // Set the onClick handler for all cards
 
   let sendClick = (name, left = true) => {
 
@@ -34,7 +40,7 @@ let setClickHandle = () => {
       sendData({
         cmd: 'click',
         button: left ? 'left' : 'right',
-        card: 'hand',
+        card: 'notdeck',
         rank: rank.replace('_', ''),
         suit: suit
       });
@@ -52,13 +58,13 @@ let setClickHandle = () => {
     return false;
   })
 
-  $('body').on('contextmenu', function() {
+  $('body').on('contextmenu', function() { // Prevent accedental right click
     return false;
   })
 
 }
 
-let getCard = (collection, targetCard) => {
+let getCard = (collection, targetCard) => { // Find Card
   for (let card of collection) {
     if (card.suit == targetCard.suit && card.rank == targetCard.rank) {
       return card;
@@ -67,7 +73,7 @@ let getCard = (collection, targetCard) => {
   return null;
 }
 
-let createFakeCards = (name, n) => {
+let createFakeCards = (name, n) => { // Creates fake cards (to mask true identity until played/drawn)
   let cards = [];
   for (let i = 0; i < n; i++) {
     $("#cards").append(`<div class="card ${name} fake_${i} unknown"></div>`);
@@ -80,9 +86,7 @@ let createFakeCards = (name, n) => {
   return cards;
 }
 
-let cardRanks = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-
-let sortDeck = (cards) => {
+let sortDeck = (cards) => { // In-place sorts cards
   cards.sort((a, b) => {
     if (a.rank != b.rank) {
        return a.rank - b.rank;
@@ -92,7 +96,7 @@ let sortDeck = (cards) => {
   });
 }
 
-let beginLeave = () => {
+let beginLeave = () => { // Start a countdown to automatically leave
 
   window.secs = 60;
 
@@ -105,7 +109,7 @@ let beginLeave = () => {
 
 }
 
-$(window).on('resize', () => {
+$(window).on('resize', () => { // Re-render all elements when the window size changes
   renderHand(hand);
   renderHand(ophand, flip=true);
   renderDeck(deck, left=true);

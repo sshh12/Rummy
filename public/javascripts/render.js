@@ -1,5 +1,8 @@
+/*
+ * Several Methods for Drawing Things
+ */
 
-let setElementPos = (element, x, y, z = 2, degs = 0) => {
+let setElementPos = (element, x, y, z = 2, degs = 0) => { // Sets an elements position via CSS
   $(element.html).css({
     'transform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
     'MozTransform': `translateX(${x}px) translateY(${y}px) rotateZ(${degs}deg)`,
@@ -9,7 +12,7 @@ let setElementPos = (element, x, y, z = 2, degs = 0) => {
   });
 }
 
-let setGlow = (selector, amt, color) => {
+let setGlow = (selector, amt, color) => { // Adds a colored glow
   selector.css({
     '-moz-box-shadow': `0 0 ${amt}px ${color}`,
     '-webkit-box-shadow': `0 0 ${amt}px ${color}`,
@@ -17,12 +20,12 @@ let setGlow = (selector, amt, color) => {
   });
 }
 
-let renderHand = (handCards, flip = false) => {
+let renderHand = (handCards, flip = false) => { // Renders hand (for both self and enemy)
 
-  if(!flip) { sortDeck(handCards) };
+  if(!flip) { sortDeck(handCards) }; // Sort my cards
 
   let height = flip ? 20 : $(window).height() - 250;
-  let dangle = flip ? 4 : -4;
+  let dangle = flip ? 4 : -4; // Rotation offset
 
   let i = 1,
       leftIndex = -1,
@@ -39,7 +42,7 @@ let renderHand = (handCards, flip = false) => {
     rightIndex = half;
   }
 
-  while (leftIndex >= 0) {
+  while (leftIndex >= 0) { // Start at middle card and setPos going outward
     setElementPos(handCards[leftIndex], offset + leftIndex * 20, height, leftIndex + 100, i * dangle);
     setElementPos(handCards[rightIndex], offset + rightIndex * 20, height, rightIndex + 100, i * -dangle);
     leftIndex--;
@@ -49,7 +52,7 @@ let renderHand = (handCards, flip = false) => {
 
 }
 
-let renderDeck = (cards, left = false) => {
+let renderDeck = (cards, left = false) => { // Renders deck (for both deck and face up draw pile)
 
   let offset = left ? $(window).width() / 2 - 200 : $(window).width() / 2 + 40;
 
@@ -59,7 +62,7 @@ let renderDeck = (cards, left = false) => {
 
 }
 
-let renderMelds = (melds) => {
+let renderMelds = (melds) => { // Renders Melds
 
   let height = 10,
       offset = 10;
@@ -71,7 +74,7 @@ let renderMelds = (melds) => {
     }
 
     height += 220;
-    if (height + 200 > $(window).height()) {
+    if (height + 200 > $(window).height()) { // Start a new column if they go off screen
       height = 10;
       offset += 240;
     }
@@ -80,7 +83,7 @@ let renderMelds = (melds) => {
 
 }
 
-let renderHint = () => {
+let renderHint = () => { // Render hint msg in the top right
 
   setElementPos({html: '#hints'}, $(window).width() - 200, 10, 9999);
 

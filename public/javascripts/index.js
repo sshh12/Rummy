@@ -1,12 +1,16 @@
-let joinGame = () => {
+/*
+ * Functions for the Lobby/Index Page
+ */
+
+let joinGame = () => { // Joins/Creates regular game
   window.location.href = "/join/" + $('#code').val();
 };
 
-let joinCPU = () => {
+let joinCPU = () => { // Creates CPU game
   window.location.href = "/joincpu/" + $('#code').val();
 };
 
-handle.status = (data) => {
+handle.status = (data) => { // Handle getting the status of a lobby
 
   if (data.cmd == 'status') {
     if (data.status == 'waiting') {
@@ -27,14 +31,14 @@ handle.status = (data) => {
 
 };
 
-$('#code').on('keyup', () => {
+$('#code').on('keyup', () => { // As the user types...
 
   $('#lobbybtn').unbind('click');
   $('#cpubtn').unbind('click');
 
   $('#cpubtn').css({ display: 'none' });
 
-  let code = $('#code').val().replace(/\W/, '');
+  let code = $('#code').val().replace(/\W/, ''); // Replace invalid chars
 
   $('#code').val(code);
 
@@ -47,7 +51,7 @@ $('#code').on('keyup', () => {
     send({
       'cmd': 'status',
       'lobby': code
-    });
+    }); // Request status of currently typed lobby
 
   } else {
 
